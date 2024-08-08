@@ -104,7 +104,7 @@ void YORKProtocol::dump(const YORKData &data) {
  * the auto on and auto off bytes are swapped in position compared to the
  * Daikin DGS01 Remote Controller.
  */
-void YORKProtocol::SetDataFromBytes(const byte byteStream[8])
+void YORKProtocol::SetDataFromBytes(const YORKData &data, const byte byteStream[8])
 {
 
     // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
@@ -114,45 +114,45 @@ void YORKProtocol::SetDataFromBytes(const byte byteStream[8])
 
     // BYTE 1: Left nibble is for operation mode and right nibble is for fan
     // mode
-    this->settings.operationMode = static_cast<operation_mode_t>(byteStream[1] >> 4);
-    this->settings.fanMode = static_cast<fan_mode_t>(byteStream[1] & 0b00001111);
+    data.operationMode = static_cast<operation_mode_t>(byteStream[1] >> 4);
+    data.fanMode = static_cast<fan_mode_t>(byteStream[1] & 0b00001111);
 
     // BYTE 2: Left nibble is the right digit of current time in minutes (0M)
     // and right nibble is the left digit of the current time in minutes (M0)
-    this->settings.currentTime.minute = ((byteStream[2] >> 4) * 10) + (byteStream[2] & 0b00001111);
+    data.currentTime.minute = ((byteStream[2] >> 4) * 10) + (byteStream[2] & 0b00001111);
 
     // BYTE 3: Left nibble is the right digit of the current time in hours (0H)
     // and the left nibble is the left digit of the current time in hours (H0)
-    this->settings.currentTime.hour = ((byteStream[3] >> 4) * 10) + (byteStream[3] & 0b00001111);
+    data.currentTime.hour = ((byteStream[3] >> 4) * 10) + (byteStream[3] & 0b00001111);
 
     // BYTE 4: Left nibble is the right digit of the on timer time in hours
     // and the first two bits of the right nibble is the left digit of the on
     // timer time in hours. The third bit of the nibble is 1 when the on
     // timer time is at half past the hour, else 0. The last bit is 1 only when
     // the on timer is active
-    this->settings.onTimer.hour =  (((byteStream[4] >> 2) & 0b00000011) * 10) + (byteStream[4] >> 4);
-    this->settings.onTimer.halfHour = (bool)((byteStream[4] & 0b00000010 ) >> 1);
-    this->settings.onTimer.active = (bool)(byteStream[4] & 0b00000001);
+    data.onTimer.hour =  (((byteStream[4] >> 2) & 0b00000011) * 10) + (byteStream[4] >> 4);
+    data.onTimer.halfHour = (bool)((byteStream[4] & 0b00000010 ) >> 1);
+    data.onTimer.active = (bool)(byteStream[4] & 0b00000001);
 
     // BYTE 5: Left nibble is the right digit of the off timer time in hours
     // and the first two bits of the right nibble is the left digit of the off
     // timer time in hours. The third bit of the nibble is 1 when the off
     // timer time is at half past the hour, else 0. The last bit is 1 only when
     // the off timer is active
-    this->settings.onTimer.hour =  (((byteStream[5] >> 2) & 0b00000011) * 10) + (byteStream[5] >> 4);
-    this->settings.onTimer.halfHour = (bool)((byteStream[5] & 0b00000010 ) >> 1);
-    this->settings.onTimer.active = (bool)(byteStream[5] & 0b00000001);
+    data.onTimer.hour =  (((byteStream[5] >> 2) & 0b00000011) * 10) + (byteStream[5] >> 4);
+    data.onTimer.halfHour = (bool)((byteStream[5] & 0b00000010 ) >> 1);
+    data.onTimer.active = (bool)(byteStream[5] & 0b00000001);
     
     // BYTE 6: Left nibble is the right digit (1s) of the temperature in
     // Celcius and the right nibble is the left digit (10s) of the temperature
     // in Celcius
-    this->settings.temperature = ((byteStream[6] >> 4) * 10) + (byteStream[6] & 0b00001111);
+    data.temperature = ((byteStream[6] >> 4) * 10) + (byteStream[6] & 0b00001111);
     
     // BYTE 7: Left nibble is a concatenation of 4-bits: Louvre Swing On/Off +
     // Sleep Mode + 1 + Power Toggle. Right nibble is the reverse bit order
     // checksum of all the reverse bit order nibbles before it.
-    this->settings.swing = (bool)(((byteStream[7] >> 4) & 0b1000) >> 3); 
-    this->settings.sleep = (bool)(((byteStream[7] >> 4) & 0b0100) >> 2);
+    data.swing = (bool)(((byteStream[7] >> 4) & 0b1000) >> 3); 
+    data.sleep = (bool)(((byteStream[7] >> 4) & 0b0100) >> 2);
   }
 
 
