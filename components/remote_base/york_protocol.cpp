@@ -33,11 +33,12 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   YORKData out;
 
   char buffer[4];
+  ESP_LOGI(TAG, "Received YORK: start");
 
   if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
     return {};
 
-  for (uint16_t index = 0; index <= 4; index ++) {
+  for (uint16_t index = 0; index == 4; index ++) {
     for (uint16_t mask = 1UL << 7; mask != 0; mask >>= 1) {
       if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
         buffer[index] |= mask;
