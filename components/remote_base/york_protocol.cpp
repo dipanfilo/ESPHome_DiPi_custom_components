@@ -87,8 +87,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   out.data  = (((byte) recived_data[0]) << 24)| (((byte) recived_data[1]) << 16)| (((byte) recived_data[2]) << 8)| ((byte) recived_data[3]);
   out.data1 = (((byte) recived_data[4]) << 24)| (((byte) recived_data[5]) << 16)| (((byte) recived_data[6]) << 8)| ((byte) recived_data[7]);
 
-  if (src.expect_item(BIT_HIGH_US, END_PULS)) {
-    if (src.expect_mark(HEADER_HIGH_US)) {
+  if ((!src.expect_item(BIT_HIGH_US, END_PULS)) || (!src.expect_mark(HEADER_HIGH_US))) {
       ESP_LOGI(TAG, "Received YORK data dont have a valid finalpuls");
       return {};
     }
