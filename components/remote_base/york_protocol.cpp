@@ -59,13 +59,13 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
       out.nbits = 1;
     }
   }
-
-  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", nbits=%d", src.size(), data.nbits);
   
+  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", nbits=%d", src.size(), data.nbits);
+
   return out;
 }
 void YORKProtocol::dump(const YORKData &data) {
-  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", nbits=%d", data.src., data.nbits);
+  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", nbits=%d", data.data, data.nbits);
 }
 
 }  // namespace remote_base
