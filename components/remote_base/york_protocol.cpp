@@ -44,7 +44,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
     return {};
 
-  for (uint8_t index = 0; index >= 8; index++) {
+  for (uint8_t index = 0; index < 8; index++) {
     for (uint8_t mask = 1UL << 7; mask != 0; mask >>= 1) {
       if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
         buffer[index] |= mask;
