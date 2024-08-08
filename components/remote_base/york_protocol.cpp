@@ -71,9 +71,13 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   }
 
   out.data  = (((byte) recived_data[0]) << 24)| (((byte) recived_data[1]) << 16)| (((byte) recived_data[2]) << 8)| ((byte) recived_data[3]);
-  ESP_LOGI(TAG, "Received YORK: data0=0x%08" PRIX32, out.data);
+  //ESP_LOGI(TAG, "Received YORK: data0=0x%08" PRIX32, out.data);
   out.data1 = (((byte) recived_data[4]) << 24)| (((byte) recived_data[5]) << 16)| (((byte) recived_data[6]) << 8)| ((byte) recived_data[7]);
-  ESP_LOGI(TAG, "Received YORK: data1=0x%08" PRIX32, out.data1);
+  //ESP_LOGI(TAG, "Received YORK: data1=0x%08" PRIX32, out.data1);
+
+
+  uint12_t minute = ((recived_data[2] >> 4) * 10) + (recived_data[2] & 0b00001111);
+  ESP_LOGI(TAG, "Received YORK: curent time minute=%d", minute);
 
   if (src.expect_item(BIT_HIGH_US, END_PULS)) {
     if (src.expect_mark(HEADER_HIGH_US)) {
@@ -86,8 +90,8 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   return out;
 }
 void YORKProtocol::dump(const YORKData &data) {
-  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", data1=0x%08 " PRIX32, data.data);
-  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", data1=0x%08 " PRIX32, data.data1);
+  ESP_LOGI(TAG, "Received YORK: data0=0x%08" PRIX32 , data.data);
+  ESP_LOGI(TAG, "Received YORK: data1=0x%08" PRIX32 , data.data1);
   ESP_LOGI(TAG, "Received YORK: currentTime=%d:%d", data.currentTime.hour, data.currentTime.minute);
   ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.offTimer.hour, data.offTimer.halfHour, data.offTimer.active);
   ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.onTimer.hour, data.onTimer.halfHour, data.onTimer.active);
