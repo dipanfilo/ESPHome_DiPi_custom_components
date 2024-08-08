@@ -24,15 +24,16 @@ static const uint32_t END_PULS = 20340;
 void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
   dst->set_carrier_frequency(38000);
   dst->reserve(2 + 64 + 64 + 3);
-  uint8_t recived_data[8];
 
-  recived_data = getDataBytes(&data, false);
+  byte *dataByteStream;
+
+  dataByteStream = getDataBytes(&data, false);
 
   dst->item(HEADER_HIGH_US, HEADER_LOW_US);
 
   for (uint8_t index = 0; index < 8; index++) {
     for (uint8_t mask = 1UL; mask != 0; mask <<= 1) {
-      if(recived_data[index] & mask) {
+      if(dataByteStream[index] & mask) {
         dst->item(BIT_HIGH_US, BIT_ONE_LOW_US);
       } else {
         item(BIT_HIGH_US, BIT_ZERO_LOW_US);
@@ -47,6 +48,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   YORKData out;
 
   uint8_t recived_data[8];
+   
   byte recived_checksum = 0;
   byte calculated_checksum = 0; 
 
@@ -173,6 +175,7 @@ void YORKProtocol::setDataFromBytes(YORKData *data, const byte byteStream[8])
 
 void YORKProtocol::getDataBytes(const YORKData *data, bool powerToggle = false) {
     static byte byteStream[8];
+    byte *byteStream;
     byte tmpByte;
     int checksum = 0;
 
