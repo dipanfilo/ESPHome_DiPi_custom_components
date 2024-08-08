@@ -146,7 +146,7 @@ DECLARE_REMOTE_PROTOCOL(YORK)
 
 template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<Ts...> {
  public:
-  TEMPLATABLE_VALUE(uint8_t, operationMode      )// = OPERATION_MODE_COOL;
+  TEMPLATABLE_VALUE(operation_mode_t, operationMode      )// = OPERATION_MODE_COOL;
   TEMPLATABLE_VALUE(uint8_t, fanMode            )// = FAN_MODE_AUTO;
   TEMPLATABLE_VALUE(uint8_t, currentTime_hour   )// = 0;
   TEMPLATABLE_VALUE(uint8_t, currentTime_minute )// = 0;
