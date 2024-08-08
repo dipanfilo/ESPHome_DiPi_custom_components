@@ -53,26 +53,16 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
       } else {
         return {};
       }
-      ESP_LOGI(TAG, "Received YORK: loop index=%d data=%d", index, buffer[index]);
     }
+    ESP_LOGI(TAG, "Received YORK: loop index=%d data=%d", index, buffer[index]);
   }
 
-
-  out.data = ((byte) buffer[6]) << 8;
-  out.data |= ((byte) buffer[7]);
-
-  uint32_t index = src.get_index();
-  ESP_LOGI(TAG, "Received YORK: index data=%d", index);
-  ESP_LOGI(TAG, "Received YORK: test0 data=%d", src[index]);
-  ESP_LOGI(TAG, "Received YORK: test1 data=%d", src[index+1]);
-  ESP_LOGI(TAG, "Received YORK: test2 data=%d", src[index+2]);
-  ESP_LOGI(TAG, "Received YORK: test3 data=%d", src[index+3]);
+  out.data = (((byte) buffer[0]) << 8) | (((byte) buffer[1]) << 8) | (((byte) buffer[2]) << 8) | (((byte) buffer[3]) << 8);
 
   if (src.expect_item(BIT_HIGH_US, END_PULS)) {
     out.nbits = 1;
-    ESP_LOGI(TAG, "Received YORK: step 1");
     if (src.expect_mark(HEADER_HIGH_US)) {
-       ESP_LOGI(TAG, "Received YORK: step 2");
+      out.nbits = 1;
     }
   }
 
