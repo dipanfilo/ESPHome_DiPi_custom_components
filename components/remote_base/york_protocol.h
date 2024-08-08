@@ -41,10 +41,10 @@ typedef enum {
 // The fan_mode_t type is used to define a variable to hold the fan mode of the
 // AC.
 typedef enum {
-    FAN_MODE_MANUAL_SPEED_1 = 0b1000,
-    FAN_MODE_MANUAL_SPEED_2 = 0b0100,
-    FAN_MODE_MANUAL_SPEED_3 = 0b0010,
     FAN_MODE_AUTO           = 0b0001,
+    FAN_MODE_MANUAL_SPEED_3 = 0b0010,
+    FAN_MODE_MANUAL_SPEED_2 = 0b0100,
+    FAN_MODE_MANUAL_SPEED_1 = 0b1000,
     FAN_MODE_QUIET          = 0b1001,
     FAN_MODE_TURBO          = 0b0011,
 } fan_mode_t;
