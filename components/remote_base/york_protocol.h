@@ -51,7 +51,7 @@ typedef enum {
 
 // The ac_settings_t type is used to define a variable to hold all the current
 // setting of the air conditioner.
-typedef struct {
+struct YORKData{
     // Header
     const char header = 0x16; //Synchronous Idle (SYN) is the ASCII control character
 
@@ -94,7 +94,7 @@ typedef struct {
     uint32_t data1;
     uint8_t nbits;
 
-} YORKData;
+};
 
 class YORKProtocol : public RemoteProtocol<YORKData> {
  public:
@@ -174,7 +174,7 @@ template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<T
     data.offTimer_active = this->offTimer_active_.value(x...);
     data.temperature = this->temperature_.value(x...);
     data.swing = this->swing_.value(x...);
-    data.nsleep = this->sleep_.value(x...);
+    data.sleep = this->sleep_.value(x...);
     YORKProtocol().encode(dst, data);
   }
 };
