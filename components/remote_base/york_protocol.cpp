@@ -102,8 +102,8 @@ void YORKProtocol::dump(const YORKData &data) {
   ESP_LOGI(TAG, "Received YORK: data0=0x%08" PRIX32 , data.data);
   ESP_LOGI(TAG, "Received YORK: data1=0x%08" PRIX32 , data.data1);
   ESP_LOGI(TAG, "Received YORK: currentTime=%d:%d", data.currentTime.hour, data.currentTime.minute);
-  ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.offTimer.hour, data.offTimer.halfHour ? 30 : 0 , data.offTimer.active);
-  ESP_LOGI(TAG, "Received YORK: onTime=%d:%d active= %d", data.onTimer.hour, data.onTimer.halfHour ? 30 : 0, data.onTimer.active);
+  ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.offTimer.hour, (data.offTimer.halfHour ? 30 : 0), data.offTimer.active);
+  ESP_LOGI(TAG, "Received YORK: onTime=%d:%d active= %d", data.onTimer.hour, (data.onTimer.halfHour ? 30 : 0), data.onTimer.active);
   ESP_LOGI(TAG, "Received YORK: setpoint=%d", data.temperature);
   ESP_LOGI(TAG, "Received YORK: operationMode=%d", data.operationMode);
   ESP_LOGI(TAG, "Received YORK: fanMode=%d", data.fanMode);
@@ -212,8 +212,8 @@ void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
     // the on timer is active
     tmpByte = (byte)(data->onTimer.hour % 10);
     tmpByte |= (byte)((data->onTimer.hour / 10) << 4);
-    tmpByte != data->onTimer.halfHour ? 0b01000000 : 0b00000000;
-    tmpByte != data->onTimer.active ? 0b10000000 : 0b00000000;
+    tmpByte != (data->onTimer.halfHour ? 0b01000000 : 0b00000000);
+    tmpByte != (data->onTimer.active ? 0b10000000 : 0b00000000);
 
     // Append BYTE 4 to byteStream
     byteStream[4] = tmpByte;
@@ -225,8 +225,8 @@ void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
     // the off timer is active
     tmpByte = (byte)(data->offTimer.hour % 10);
     tmpByte |= (byte)((data->offTimer.hour / 10) << 4);
-    tmpByte != data->offTimer.halfHour ? 0b01000000 : 0b00000000;
-    tmpByte != data->offTimer.active ? 0b10000000 : 0b00000000;
+    tmpByte != (data->offTimer.halfHour ? 0b01000000 : 0b00000000);
+    tmpByte != (data->offTimer.active ? 0b10000000 : 0b00000000);
 
     // Append BYTE 5 to byteStream
     byteStream[5] = tmpByte;
