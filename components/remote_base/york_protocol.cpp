@@ -94,7 +94,7 @@ void YORKProtocol::dump(const YORKData &data) {
   ESP_LOGI(TAG, "Received YORK: data1=0x%08" PRIX32 , data.data1);
   ESP_LOGI(TAG, "Received YORK: currentTime=%d:%d", data.currentTime.hour, data.currentTime.minute);
   ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.offTimer.hour, data.offTimer.halfHour, data.offTimer.active);
-  ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.onTimer.hour, data.onTimer.halfHour, data.onTimer.active);
+  ESP_LOGI(TAG, "Received YORK: onTime=%d:%d active= %d", data.onTimer.hour, data.onTimer.halfHour, data.onTimer.active);
   ESP_LOGI(TAG, "Received YORK: setpoint=%d", data.temperature);
   ESP_LOGI(TAG, "Received YORK: operationMode=%d", data.operationMode);
   ESP_LOGI(TAG, "Received YORK: fanMode=%d", data.fanMode);
@@ -138,18 +138,18 @@ void YORKProtocol::SetDataFromBytes(YORKData *data, const byte byteStream[8])
     // timer time in hours. The third bit of the nibble is 1 when the on
     // timer time is at half past the hour, else 0. The last bit is 1 only when
     // the on timer is active
-    data->onTimer.hour =  (((byteStream[4] >> 2) & 0b00000011) * 10) + (byteStream[4] >> 4);
-    data->onTimer.halfHour = (bool)((byteStream[4] & 0b00000010 ) >> 1);
-    data->onTimer.active = (bool)(byteStream[4] & 0b00000001);
+    data->onTimer.hour =          (((byteStream[4] & 0b00110000) >> 4) * 10) + (byteStream[4] & 0b00001111);
+    data->onTimer.halfHour = (bool)((byteStream[4] & 0b01000000) >> 6);
+    data->onTimer.active   = (bool)((byteStream[4] & 0b10000000) >> 7);
 
     // BYTE 5: Left nibble is the right digit of the off timer time in hours
     // and the first two bits of the right nibble is the left digit of the off
     // timer time in hours. The third bit of the nibble is 1 when the off
     // timer time is at half past the hour, else 0. The last bit is 1 only when
     // the off timer is active
-    data->onTimer.hour =  (((byteStream[5] >> 2) & 0b00000011) * 10) + (byteStream[5] >> 4);
-    data->onTimer.halfHour = (bool)((byteStream[5] & 0b00000010 ) >> 1);
-    data->onTimer.active = (bool)(byteStream[5] & 0b00000001);
+    data->offTimer.hour =          (((byteStream[5] & 0b00110000) >> 4) * 10) + (byteStream[5] & 0b00001111);
+    data->offTimer.halfHour = (bool)((byteStream[5] & 0b01000000) >> 6);
+    data->offTimer.active   = (bool)((byteStream[5] & 0b10000000) >> 7);
     
     // BYTE 6: Left nibble is the right digit (1s) of the temperature in
     // Celcius and the right nibble is the left digit (10s) of the temperature
