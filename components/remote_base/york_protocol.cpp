@@ -78,7 +78,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
     }
   }
 
-  YORKProtocol::SetDataToBytes(const &recived_data);
+  SetDataToBytes(const &recived_data);
 
   return out;
 }
