@@ -132,24 +132,8 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   YORKData settings;
 
  protected:
-  /*
-  * containing nibble manipulation methods to be used for various
-  * operations such as checksumming.
-  */
-  // This is simply a lookup table containing the reversed bit order
-  // nibbles of numbers 0 through 15
-  const byte reverseNibbleLookup[16] = {
-      0b0000, 0b0001, 0b0010, 0b0011, 0b0100, 0b0101, 0b0110, 0b0111,
-//    0b0000, 0b1000, 0b0100, 0b1100, 0b0010, 0b1010, 0b0110, 0b1110, 
-      0b1000, 0b1001, 0b1010, 0b1011, 0b1100, 0b1101, 0b1110, 0b1111
-//    0b0001, 0b1001, 0b0101, 0b1101, 0b0011, 0b1011, 0b0111, 0b1111
-  };
-
-  // This method takes a nibble and uses the reverseNibbleLookup array to map the
-  // reverse byte order nibble and return it to the caller. The leftNibble
-  // argument is true if we want the reverse byte order nibble of the left nibble
-  // of a byte.
-  byte reverseNibble(byte nibble, bool leftNibble = false)
+  // This method takes the left or right nibble and return it to the caller. 
+  byte selectNibble(byte nibble, bool leftNibble = false)
   {
    if (!leftNibble)
    {
