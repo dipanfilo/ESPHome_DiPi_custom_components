@@ -41,30 +41,18 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
     return {};
 
+
   for (uint8_t index = 0; index < 8; index++) {
-    for (uint8_t mask = 0; mask < 8; mask++) {
+    for (uint8_t mask = 1UL << 7; mask != 0; mask >>= 1) {
       if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
-        recived_data[index] = ( recived_data[index] >> 1) | 0b10000000;
+        recived_data[index] |= mask;
       } else if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
-        recived_data[index] = ( recived_data[index] >> 1) | 0;
+        recived_data[index] &= ~mask;
       } else {
         return {};
       }
     }
   }
-
-
-//  for (uint8_t index = 0; index < 8; index++) {
-//    for (uint8_t mask = 1UL << 7; mask != 0; mask >>= 1) {
-//      if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
-//        recived_data[index] |= mask;
-//      } else if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
-//        recived_data[index] &= ~mask;
-//      } else {
-//        return {};
-//      }
-//    }
-//  }
 
   recived_checksum = recived_data[7] & 0b00001111;
 
