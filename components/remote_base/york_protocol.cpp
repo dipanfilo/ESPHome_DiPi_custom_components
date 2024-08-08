@@ -95,10 +95,6 @@ void YORKProtocol::dump(const YORKData &data) {
 }
 
 
-
-
-
-
 /*
  * This method generates a 64-bit (8 bytes or 16 nibbles) long stream for the
  * York ECGS01-i Remote Controller containing an 8-bit header, 1-nibble for AC
@@ -108,8 +104,8 @@ void YORKProtocol::dump(const YORKData &data) {
  * the auto on and auto off bytes are swapped in position compared to the
  * Daikin DGS01 Remote Controller.
  */
-static void YORKProtocol::SetDataFromBytes(byte byteStream[8]) {
-    byte tmpByte;
+void YORKProtocol::SetDataFromBytes(const byte &byteStream[8])
+{
 
     // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
     // representation of the ASCII character 'h' (probably just short for
