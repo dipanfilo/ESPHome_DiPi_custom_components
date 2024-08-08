@@ -56,6 +56,10 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
     }
   }
 
+
+  data.data = ((byte) buffer[7]) << 8;
+  data.data |= ((byte) buffer[8]);
+
   uint32_t index = src.get_index();
   ESP_LOGI(TAG, "Received YORK: index data=%d", index);
   ESP_LOGI(TAG, "Received YORK: test0 data=%d", src[index]);
