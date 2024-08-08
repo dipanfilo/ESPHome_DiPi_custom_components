@@ -56,7 +56,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
 
   uint32_t index = src.get_index();
   int32_t value = src.operator[](index+1);
-  ESP_LOGI(TAG, "Received YORK: test data=%08" PRIX32, data.value);
+  ESP_LOGI(TAG, "Received YORK: test data=%08" PRIX32, value);
 
 
   if (src.expect_item(BIT_HIGH_US, END_PULS)) {
