@@ -153,9 +153,9 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   {
    if (!leftNibble)
    {
-    return reverseNibbleLookup[nibble & 0xF];
+    return nibble & 0xF;
    }
-   return reverseNibbleLookup[nibble >> 4];
+   return nibble >> 4;
   }
 };
 
