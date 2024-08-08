@@ -175,7 +175,7 @@ template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<T
     settings.temperature = this->temperature_.value(x...);
     settings.swing = this->swing_.value(x...);
     settings.sleep = this->sleep_.value(x...);
-    YORKProtocol().encode(dst, data);
+    YORKProtocol().encode(dst, settings);
   }
 };
 
