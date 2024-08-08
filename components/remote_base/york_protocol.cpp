@@ -58,7 +58,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   //check the recived data checksum
   for (int i = 0; i < 8; i++) {
     // Add reverse left nibble value
-    calculated_checksum += reverseNibble(recived_data[i], false);
+    calculated_checksum += reverseNibble(recived_data[i], true);
     // Add reverse right nibble value
     if (i < 7)
       calculated_checksum += reverseNibble(recived_data[i]);
@@ -160,7 +160,7 @@ void YORKProtocol::SetDataFromBytes(YORKData *data, const byte byteStream[8])
     // checksum of all the reverse bit order nibbles before it.
     data->swing = (bool)((byteStream[7] & 0b00000001) >> 3); 
     data->sleep = (bool)((byteStream[7] & 0b00000010) >> 2);
-    
+
   }
 
 
