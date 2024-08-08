@@ -133,10 +133,10 @@ void YORKProtocol::getDataBytes(bool powerToggle = false) {
     // BYTE 7: Left nibble is a concatenation of 4-bits: Louvre Swing On/Off +
     // Sleep Mode + 1 + Power Toggle. Right nibble is the reverse bit order
     // checksum of all the reverse bit order nibbles before it.
-    tmpByte = (settings.swing ? 0b1000 : 0b0000);  // Louvre Swing On/Off
-    tmpByte |= (settings.sleep ? 0b0100 : 0b0000); // Sleep Mode On/Off
-    tmpByte |= 0b0010;                             // This bit is always 1
-    tmpByte |= (powerToggle ? 0b0001 : 0b0000);    // Power toggle bit
+    tmpByte = (settings.swing ? 0b0001 : 0b0000);  // Louvre Swing On/Off
+    tmpByte |= (settings.sleep ? 0b0010 : 0b0000); // Sleep Mode On/Off
+    tmpByte |= 0b0100;                             // This bit is always 1
+    tmpByte |= (powerToggle ? 0b1000 : 0b0000);    // Power toggle bit
 
     // Append left half of BYTE 7 to byteStream
     byteStream[7] = tmpByte << 4;

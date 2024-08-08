@@ -33,20 +33,20 @@ typedef struct {
 // The operation_mode_t type is used to define a variable to hold the desired
 // operation mode of the AC.
 typedef enum {
-    OPERATION_MODE_DRY  = 0b1000,
-    OPERATION_MODE_COOL = 0b0100,
-    OPERATION_MODE_FAN  = 0b0010
+    OPERATION_MODE_DRY  = 0b0001,
+    OPERATION_MODE_COOL = 0b0010,
+    OPERATION_MODE_FAN  = 0b0100
 } operation_mode_t;
 
 // The fan_mode_t type is used to define a variable to hold the fan mode of the
 // AC.
 typedef enum {
-    FAN_MODE_MANUAL_SPEED_1 = 0b0001,
-    FAN_MODE_MANUAL_SPEED_2 = 0b0010,
-    FAN_MODE_MANUAL_SPEED_3 = 0b0100,
-    FAN_MODE_AUTO           = 0b1000,
+    FAN_MODE_MANUAL_SPEED_1 = 0b1000,
+    FAN_MODE_MANUAL_SPEED_2 = 0b0100,
+    FAN_MODE_MANUAL_SPEED_3 = 0b0010,
+    FAN_MODE_AUTO           = 0b0001,
     FAN_MODE_QUIET          = 0b1001,
-    FAN_MODE_TURBO          = 0b1100
+    FAN_MODE_TURBO          = 0b0011,
 } fan_mode_t;
 
 // The ac_settings_t type is used to define a variable to hold all the current
@@ -139,8 +139,10 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   // This is simply a lookup table containing the reversed bit order
   // nibbles of numbers 0 through 15
   const byte reverseNibbleLookup[16] = {
-      0b0000, 0b1000, 0b0100, 0b1100, 0b0010, 0b1010, 0b0110, 0b1110,
-      0b0001, 0b1001, 0b0101, 0b1101, 0b0011, 0b1011, 0b0111, 0b1111
+      0b0000, 0b0001, 0b0010, 0b0011, 0b0100, 0b0101, 0b0110, 0b0111,
+//    0b0000, 0b1000, 0b0100, 0b1100, 0b0010, 0b1010, 0b0110, 0b1110, 
+      0b1000, 0b1001, 0b1010, 0b1011, 0b1100, 0b1101, 0b1110, 0b1111
+//    0b0001, 0b1001, 0b0101, 0b1101, 0b0011, 0b1011, 0b0111, 0b1111
   };
 
   // This method takes a nibble and uses the reverseNibbleLookup array to map the
