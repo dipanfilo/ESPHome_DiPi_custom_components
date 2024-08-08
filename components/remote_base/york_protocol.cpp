@@ -127,11 +127,11 @@ void YORKProtocol::SetDataFromBytes(YORKData *data, const byte byteStream[8])
 
     // BYTE 2: Left nibble is the right digit of current time in minutes (0M)
     // and right nibble is the left digit of the current time in minutes (M0)
-    data->currentTime.minute = (byteStream[2] >> 4) + ((byteStream[2] & 0b00001111) * 10);
+    data->currentTime.minute = ((byteStream[2] >> 4) * 10) + (byteStream[2] & 0b00001111));
 
     // BYTE 3: Left nibble is the right digit of the current time in hours (0H)
     // and the left nibble is the left digit of the current time in hours (H0)
-    data->currentTime.hour = (byteStream[3] >> 4) + ((byteStream[3] & 0b00001111) * 10);
+    data->currentTime.hour = ((byteStream[3] >> 4) * 10) + (byteStream[3] & 0b00001111);
 
     // BYTE 4: Left nibble is the right digit of the on timer time in hours
     // and the first two bits of the right nibble is the left digit of the on
