@@ -58,10 +58,10 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   //check the recived data checksum
   for (int i = 0; i < 8; i++) {
     // Add reverse left nibble value
-    calculated_checksum += reverseNibble(recived_data[i], true);
+    calculated_checksum += reverseNibble(recived_data[i], false);
     // Add reverse right nibble value
     if (i < 7)
-      calculated_checksum += reverseNibble(recived_data[i]);
+      calculated_checksum += reverseNibble(recived_data[i], true);
   }
   calculated_checksum = reverseNibble(calculated_checksum);
 
