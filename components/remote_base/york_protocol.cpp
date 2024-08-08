@@ -173,7 +173,7 @@ void YORKProtocol::setDataFromBytes(YORKData *data, const byte byteStream[8])
 
   }
 
-void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream[8]) {
+void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
 
     byte tmpByte;
     int checksum = 0;
