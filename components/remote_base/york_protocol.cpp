@@ -54,7 +54,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   }
 
 
-  if expect_pulse_with_gap(BIT_HIGH_US, END_PULS) {
+  if (expect_pulse_with_gap(BIT_HIGH_US, END_PULS)) {
     if (src.expect_mark(HEADER_HIGH_US)) {
       out.nbits = 1;
     }
