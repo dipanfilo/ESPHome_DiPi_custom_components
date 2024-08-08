@@ -86,7 +86,8 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   return out;
 }
 void YORKProtocol::dump(const YORKData &data) {
-  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 " 0x%08 " PRIX32 ", nbits=%d", data.data, data.data1, data.nbits);
+  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", data1=0x%08 " PRIX32, data.data);
+  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", data1=0x%08 " PRIX32, data.data1);
   ESP_LOGI(TAG, "Received YORK: currentTime=%d:%d", data.currentTime.hour, data.currentTime.minute);
   ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.offTimer.hour, data.offTimer.halfHour, data.offTimer.active);
   ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.onTimer.hour, data.onTimer.halfHour, data.onTimer.active);
