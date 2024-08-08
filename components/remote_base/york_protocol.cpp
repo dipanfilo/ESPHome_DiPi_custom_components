@@ -37,22 +37,24 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   out.data = 0;
   out.nbits = 0;
 
+  uint8_t buffer[8];
+
   bool End_OK = false;
 
   if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
     return {};
 
-  
-  for (uint32_t mask = 1UL << 31; mask != 0; mask >>= 1) {
-    if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
-      out.data |= mask;
-    } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
-      out.data &= ~mask;
-    } else {
-      return {};
+  for (uint8_t index = 0; index >= 8; index++) {
+    for (uint8_t mask = 1UL << 7; mask != 0; mask >>= 1) {
+      if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
+        buffer[index] |= mask;
+      } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
+        buffer[index] &= ~mask;
+      } else {
+        return {};
+      }
     }
   }
-
 
   uint32_t index = src.get_index();
   ESP_LOGI(TAG, "Received YORK: index data=%d", index);
