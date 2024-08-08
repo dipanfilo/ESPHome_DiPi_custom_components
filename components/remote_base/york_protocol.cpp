@@ -13,6 +13,8 @@ static const uint32_t BIT_HIGH_US = 368;
 static const uint32_t BIT_ONE_LOW_US = 944;
 static const uint32_t BIT_ZERO_LOW_US = 368;
 
+static const uint32_t END_PULS = 20340;
+
 void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
   dst->set_carrier_frequency(38000);
   dst->reserve(2 + data.nbits * 2u);
@@ -34,7 +36,9 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
 
   out.data = 0;
   out.nbits = 0;
-  
+
+  bool End_OK = false;
+
   if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
     return {};
 
@@ -48,6 +52,14 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
       return {};
     }
   }
+
+
+  if expect_pulse_with_gap(BIT_HIGH_US, END_PULS) {
+    if (src.expect_mark(HEADER_HIGH_US)) {
+      out.nbits = 1;
+    }
+  }
+  
   return out;
 }
 void YORKProtocol::dump(const YORKData &data) {
