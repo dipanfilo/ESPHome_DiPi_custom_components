@@ -108,18 +108,18 @@ void YORKProtocol::dump(const YORKData &data) {
  * the auto on and auto off bytes are swapped in position compared to the
  * Daikin DGS01 Remote Controller.
  */
-void YORKProtocol::SetDataToBytes(byte byteStream[8]) {
+void YORKProtocol::SetDataFromBytes(byte byteStream[8]) {
     byte tmpByte;
 
     // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
     // representation of the ASCII character 'h' (probably just short for
     // "header")
-    settings.header = byteStream[0]; 
+    //settings.header = byteStream[0]; 
 
     // BYTE 1: Left nibble is for operation mode and right nibble is for fan
     // mode
-    settings.operationMode = byteStream[1] >> 4;
-    settings.fanMode = byteStream[1] 111;& 0b00001
+    //settings.operationMode = byteStream[1] >> 4;
+    //settings.fanMode = byteStream[1] 111;& 0b00001
 
     // BYTE 2: Left nibble is the right digit of current time in minutes (0M)
     // and right nibble is the left digit of the current time in minutes (M0)
