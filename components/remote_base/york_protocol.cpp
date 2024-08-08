@@ -54,10 +54,9 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
         return {};
       }
     }
-    ESP_LOGI(TAG, "Received YORK: loop index=%d data=%d", index, buffer[index]);
   }
 
-  out.data = (((byte) buffer[0]) << 8) | (((byte) buffer[1]) << 8) | (((byte) buffer[2]) << 8) | (((byte) buffer[3]) << 8);
+  out.data = (((byte) buffer[0]) << 24) | (((byte) buffer[1]) << 16) | (((byte) buffer[2]) << 8) | (((byte) buffer[3]));
 
   if (src.expect_item(BIT_HIGH_US, END_PULS)) {
     out.nbits = 1;
@@ -76,4 +75,4 @@ void YORKProtocol::dump(const YORKData &data) {
 }  // namespace esphome
 
 
-// 134 = 64 + 
+// 134 = 2 + 64 + 64 + 3
