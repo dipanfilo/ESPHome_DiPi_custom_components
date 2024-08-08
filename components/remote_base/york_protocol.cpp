@@ -50,11 +50,11 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
       } else {
         return {};
       }
-      ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", index=%d", out.data, index );
     }
+    ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", index=%d", out.data, index );
   }
 
-  out.data = buffer[2];
+  //out.data = buffer[2];
   return out;
 }
 void YORKProtocol::dump(const YORKData &data) {
