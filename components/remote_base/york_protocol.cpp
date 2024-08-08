@@ -264,8 +264,6 @@ void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
 
     // OR checksum with BYTE 7 of byteStream
     byteStream[7] |= (byte)(selectNibble(checksum, false) << 4);
-
-    return byteStream;
 }
 
 
