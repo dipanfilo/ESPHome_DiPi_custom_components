@@ -123,11 +123,11 @@ void YORKProtocol::SetDataFromBytes(byte byteStream[8]) {
 
     // BYTE 2: Left nibble is the right digit of current time in minutes (0M)
     // and right nibble is the left digit of the current time in minutes (M0)
-    settings.currentTime.minute = ((byteStream[2] >> 4) * 10) + (byteStream[2] & 0b00001111;
+    settings.currentTime.minute = ((byteStream[2] >> 4) * 10) + (byteStream[2] & 0b00001111);
 
     // BYTE 3: Left nibble is the right digit of the current time in hours (0H)
     // and the left nibble is the left digit of the current time in hours (H0)
-    settings.currentTime.hour = ((byteStream[3] >> 4) * 10) + (byteStream[3] & 0b00001111;
+    settings.currentTime.hour = ((byteStream[3] >> 4) * 10) + (byteStream[3] & 0b00001111);
 
     // BYTE 4: Left nibble is the right digit of the on timer time in hours
     // and the first two bits of the right nibble is the left digit of the on
@@ -150,7 +150,7 @@ void YORKProtocol::SetDataFromBytes(byte byteStream[8]) {
     // BYTE 6: Left nibble is the right digit (1s) of the temperature in
     // Celcius and the right nibble is the left digit (10s) of the temperature
     // in Celcius
-    settings.temperature = ((byteStream[6] >> 4) * 10) + (byteStream[6] & 0b00001111;
+    settings.temperature = ((byteStream[6] >> 4) * 10) + (byteStream[6] & 0b00001111);
     
     // BYTE 7: Left nibble is a concatenation of 4-bits: Louvre Swing On/Off +
     // Sleep Mode + 1 + Power Toggle. Right nibble is the reverse bit order
