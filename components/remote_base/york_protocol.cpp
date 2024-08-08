@@ -212,8 +212,8 @@ void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
     // the on timer is active
     tmpByte = (byte)(data->onTimer.hour % 10);
     tmpByte |= (byte)((data->onTimer.hour / 10) << 4);
-    tmpByte != (data->onTimer.halfHour ? 0b01000000 : 0b00000000);
-    tmpByte != (data->onTimer.active ? 0b10000000 : 0b00000000);
+    tmpByte |= data->onTimer.halfHour ? 0b01000000 : 0b00000000;
+    tmpByte |= data->onTimer.active ? 0b10000000 : 0b00000000;
 
     // Append BYTE 4 to byteStream
     byteStream[4] = tmpByte;
@@ -225,8 +225,8 @@ void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
     // the off timer is active
     tmpByte = (byte)(data->offTimer.hour % 10);
     tmpByte |= (byte)((data->offTimer.hour / 10) << 4);
-    tmpByte != (data->offTimer.halfHour ? 0b01000000 : 0b00000000);
-    tmpByte != (data->offTimer.active ? 0b10000000 : 0b00000000);
+    tmpByte |= data->offTimer.halfHour ? 0b01000000 : 0b00000000;
+    tmpByte |= data->offTimer.active ? 0b10000000 : 0b00000000;
 
     // Append BYTE 5 to byteStream
     byteStream[5] = tmpByte;
