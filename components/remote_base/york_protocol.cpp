@@ -76,7 +76,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   //ESP_LOGI(TAG, "Received YORK: data1=0x%08" PRIX32, out.data1);
 
 
-  uint12_t minute = ((recived_data[2] >> 4) * 10) + (recived_data[2] & 0b00001111);
+  uint16_t minute = ((recived_data[2] >> 4) * 10) + (recived_data[2] & 0b00001111);
   ESP_LOGI(TAG, "Received YORK: curent time minute=%d", minute);
 
   if (src.expect_item(BIT_HIGH_US, END_PULS)) {
