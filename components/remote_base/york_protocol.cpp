@@ -53,7 +53,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
     }
   }
 
-  recived_checksum = recived_data[7] & 0b00001111;
+  recived_checksum = ((recived_data[7] & 0b11110000) >> 4) ;
 
   //check the recived data checksum
   for (int i = 0; i < 8; i++) {
@@ -65,7 +65,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   }
   calculated_checksum = reverseNibble(calculated_checksum);
 
-  if(!(recived_checksum = calculated_checksum)) {
+  if(!(recived_checksum == calculated_checksum)) {
     ESP_LOGI(TAG, "Received YORK data are not valid");
     return {};
   }
@@ -120,21 +120,21 @@ void YORKProtocol::SetDataFromBytes(YORKData *data, const byte byteStream[8])
     // "header")
     //settings.header = byteStream[0]; 
 
-    // BYTE 1: Left nibble is for operation mode and right nibble is for fan
+    // BYTE 1: right nibble is for operation mode and left nibble is for fan
     // mode
-    data->operationMode = static_cast<operation_mode_t>(byteStream[1] >> 4);
-    data->fanMode = static_cast<fan_mode_t>(byteStream[1] & 0b00001111);
+    data->operationMode = static_cast<operation_mode_t>(byteStream[1] & 0b00001111);
+    data->fanMode = static_cast<fan_mode_t>(byteStream[1] >> 4);
 
-    // BYTE 2: Left nibble is the right digit of current time in minutes (0M)
-    // and right nibble is the left digit of the current time in minutes (M0)
+    // BYTE 2: right nibble is the right digit of current time in minutes (0M)
+    // and left nibble is the left digit of the current time in minutes (M0)
     data->currentTime.minute = ((byteStream[2] >> 4) * 10) + (byteStream[2] & 0b00001111);
 
-    // BYTE 3: Left nibble is the right digit of the current time in hours (0H)
+    // BYTE 3: right nibble is the right digit of the current time in hours (0H)
     // and the left nibble is the left digit of the current time in hours (H0)
     data->currentTime.hour = ((byteStream[3] >> 4) * 10) + (byteStream[3] & 0b00001111);
 
-    // BYTE 4: Left nibble is the right digit of the on timer time in hours
-    // and the first two bits of the right nibble is the left digit of the on
+    // BYTE 4: right nibble is the right digit of the on timer time in hours
+    // and the first two bits of the left nibble is the left digit of the on
     // timer time in hours. The third bit of the nibble is 1 when the on
     // timer time is at half past the hour, else 0. The last bit is 1 only when
     // the on timer is active
@@ -142,8 +142,8 @@ void YORKProtocol::SetDataFromBytes(YORKData *data, const byte byteStream[8])
     data->onTimer.halfHour = (bool)((byteStream[4] & 0b01000000) >> 6);
     data->onTimer.active   = (bool)((byteStream[4] & 0b10000000) >> 7);
 
-    // BYTE 5: Left nibble is the right digit of the off timer time in hours
-    // and the first two bits of the right nibble is the left digit of the off
+    // BYTE 5: right nibble is the right digit of the off timer time in hours
+    // and the first two bits of the left nibble is the left digit of the off
     // timer time in hours. The third bit of the nibble is 1 when the off
     // timer time is at half past the hour, else 0. The last bit is 1 only when
     // the off timer is active
@@ -151,13 +151,13 @@ void YORKProtocol::SetDataFromBytes(YORKData *data, const byte byteStream[8])
     data->offTimer.halfHour = (bool)((byteStream[5] & 0b01000000) >> 6);
     data->offTimer.active   = (bool)((byteStream[5] & 0b10000000) >> 7);
     
-    // BYTE 6: Left nibble is the right digit (1s) of the temperature in
-    // Celcius and the right nibble is the left digit (10s) of the temperature
+    // BYTE 6: right nibble is the right digit (1s) of the temperature in
+    // Celcius and the left nibble is the left digit (10s) of the temperature
     // in Celcius
     data->temperature = ((byteStream[6] >> 4) * 10) + (byteStream[6] & 0b00001111);
     
-    // BYTE 7: Left nibble is a concatenation of 4-bits: Louvre Swing On/Off +
-    // Sleep Mode + 1 + Power Toggle. Right nibble is the reverse bit order
+    // BYTE 7: right nibble is a concatenation of 4-bits: Louvre Swing On/Off +
+    // Sleep Mode + 1 + Power Toggle. Left nibble is the reverse bit order
     // checksum of all the reverse bit order nibbles before it.
     data->swing = (bool)(((byteStream[7] >> 4) & 0b1000) >> 3); 
     data->sleep = (bool)(((byteStream[7] >> 4) & 0b0100) >> 2);
