@@ -116,7 +116,7 @@ void YORKProtocol::SetDataFromBytes(YORKData *data, const byte byteStream[8])
 
     // BYTE 1: Left nibble is for operation mode and right nibble is for fan
     // mode
-    data.operationMode = static_cast<operation_mode_t>(byteStream[1] >> 4);
+    data->operationMode = static_cast<operation_mode_t>(byteStream[1] >> 4);
     data->fanMode = static_cast<fan_mode_t>(byteStream[1] & 0b00001111);
 
     // BYTE 2: Left nibble is the right digit of current time in minutes (0M)
