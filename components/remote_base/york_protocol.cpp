@@ -27,7 +27,7 @@ void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
 
   byte dataByteStream[8];
 
-  getDataBytes(&data, &dataByteStream);
+  getDataBytes(&data, dataByteStream);
 
   dst->item(HEADER_HIGH_US, HEADER_LOW_US);
 
