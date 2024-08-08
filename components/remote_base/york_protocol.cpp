@@ -66,8 +66,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   calculated_checksum = reverseNibble(calculated_checksum);
 
   if(!(recived_checksum == calculated_checksum)) {
-    ESP_LOGI(TAG, "Received YORK data are not valid");
-    return {};
+    ESP_LOGI(TAG, "Received YORK data dont have a valid checksum: calc_checksum=0x%08" PRIX32 , calculated_checksum);
   }
 
   out.data  = (((byte) recived_data[0]) << 24)| (((byte) recived_data[1]) << 16)| (((byte) recived_data[2]) << 8)| ((byte) recived_data[3]);
