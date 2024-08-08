@@ -25,9 +25,9 @@ void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
   dst->set_carrier_frequency(38000);
   dst->reserve(2 + 64 + 64 + 3);
 
-  byte *dataByteStream;
+  byte dataByteStream[8];
 
-  dataByteStream = getDataBytes(&data, false);
+  getDataBytes(&data, &dataByteStream);
 
   dst->item(HEADER_HIGH_US, HEADER_LOW_US);
 
@@ -173,8 +173,7 @@ void YORKProtocol::setDataFromBytes(YORKData *data, const byte byteStream[8])
 
   }
 
-void YORKProtocol::getDataBytes(const YORKData *data, bool powerToggle = false) {
-    static byte byteStream[8];
+void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream[8]) {
 
     byte tmpByte;
     int checksum = 0;
@@ -247,7 +246,7 @@ void YORKProtocol::getDataBytes(const YORKData *data, bool powerToggle = false) 
     tmpByte = (data->swing ? 0b0001 : 0b0000);  // Louvre Swing On/Off
     tmpByte |= (data->sleep ? 0b0010 : 0b0000); // Sleep Mode On/Off
     tmpByte |= 0b0100;                             // This bit is always 1
-    tmpByte |= (powerToggle ? 0b1000 : 0b0000);    // Power toggle bit
+    //tmpByte |= (powerToggle ? 0b1000 : 0b0000);    // Power toggle bit
 
     // Append left half of BYTE 7 to byteStream
     byteStream[7] = tmpByte;
