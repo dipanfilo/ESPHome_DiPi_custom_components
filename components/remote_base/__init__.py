@@ -1963,3 +1963,44 @@ async def mirage_action(var, config, args):
     vec_ = cg.std_vector.template(cg.uint8)
     template_ = await cg.templatable(config[CONF_CODE], args, vec_, vec_)
     cg.add(var.set_code(template_))
+
+
+# York
+YORKData, YORKBinarySensor, YORKTrigger, YORKAction, YORKDumper = declare_protocol("YORK")
+YORK_SCHEMA = cv.Schema(
+    {
+        cv.Required(CONF_DATA): cv.hex_uint32_t,
+        cv.Optional(CONF_NBITS, default=28): cv.one_of(28, 32, int=True),
+    }
+)
+
+
+@register_binary_sensor("york", YORKBinarySensor, YORK_SCHEMA)
+def york_binary_sensor(var, config):
+    cg.add(
+        var.set_data(
+            cg.StructInitializer(
+                YORKData,
+                ("data", config[CONF_DATA]),
+                ("nbits", config[CONF_NBITS]),
+            )
+        )
+    )
+
+
+@register_trigger("york", YORKTrigger, YORKData)
+def york_trigger(var, config):
+    pass
+
+
+@register_dumper("york", YORKDumper)
+def york_dumper(var, config):
+    pass
+
+
+@register_action("york", YORKAction, YORK_SCHEMA)
+async def york_action(var, config, args):
+    template_ = await cg.templatable(config[CONF_DATA], args, cg.uint32)
+    cg.add(var.set_data(template_))
+    template_ = await cg.templatable(config[CONF_NBITS], args, cg.uint8)
+    cg.add(var.set_nbits(template_))
