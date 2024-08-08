@@ -80,7 +80,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
     }
   }
 
-  SetDataFromBytes(*out, recived_data);
+  SetDataFromBytes(&out, recived_data);
 
   return out;
 }
@@ -106,7 +106,7 @@ void YORKProtocol::dump(const YORKData &data) {
  * the auto on and auto off bytes are swapped in position compared to the
  * Daikin DGS01 Remote Controller.
  */
-void YORKProtocol::SetDataFromBytes(YORKData &data, const byte byteStream[8])
+void YORKProtocol::SetDataFromBytes(YORKData* data, const byte byteStream[8])
 {
 
     // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
