@@ -162,8 +162,19 @@ template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<T
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
     YORKData data{};
-    data.data = this->data_.value(x...);
-    data.nbits = this->nbits_.value(x...);
+    data.operationMode = this->operationMode_.value(x...);
+    data.fanMode = this->fanMode_.value(x...);
+    data.currentTime_hour = this->currentTime_hour_.value(x...);
+    data.currentTime_minute = this->currentTime_minute_.value(x...);
+    data.onTimer_hour = this->onTimer_hour_.value(x...);
+    data.onTimer_halfHour = this->onTimer_halfHour_.value(x...);
+    data.onTimer_active = this->onTimer_active_.value(x...);
+    data.offTimer_hour = this->offTimer_hour_.value(x...);
+    data.offTimer_halfHour = this->offTimer_halfHour_.value(x...);
+    data.offTimer_active = this->offTimer_active_.value(x...);
+    data.temperature = this->temperature_.value(x...);
+    data.swing = this->swing_.value(x...);
+    data.nsleep = this->sleep_.value(x...);
     YORKProtocol().encode(dst, data);
   }
 };
