@@ -98,6 +98,31 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   void encode(RemoteTransmitData *dst, const YORKData &data) override;
   optional<YORKData> decode(RemoteReceiveData src) override;
   void dump(const YORKData &data) override;
+
+ private:
+  // Pulse and pause lengths
+  const int pulseLength  = 368; // 368 us pulse
+  const int pauseLength0 = -368; // 368 us space
+  const int pauseLength1 = -944; // 944 us space
+
+  // The "beginning of transmission" signal consists of the following
+  // pulse/pause pairs
+  const int beginTransmission[6] = {
+      9788, -9676, // 9.788ms pulse, 9.676ms pause
+      9812, -9680, // 9.812ms pulse, 9.680ms pause
+      4652, -2408  // 4.652ms pulse, 2.408ms pause
+  };
+
+  // The "end of transmission" signal consists of the following pulses
+  // and pause
+  const int endTransmission[3] = {
+      368,   // 368us pulse
+      -20340, // 20.34ms pause
+      4624   // 4.624 ms pulse
+  };
+
+  // Air conditioner settings
+  YORKData settings;
 };
 
 DECLARE_REMOTE_PROTOCOL(YORK)

@@ -6,11 +6,12 @@ namespace remote_base {
 
 static const char *const TAG = "remote.york";
 
-static const uint32_t HEADER_HIGH_US = 8000;
-static const uint32_t HEADER_LOW_US = 4000;
-static const uint32_t BIT_HIGH_US = 600;
-static const uint32_t BIT_ONE_LOW_US = 1600;
-static const uint32_t BIT_ZERO_LOW_US = 550;
+static const uint32_t HEADER_HIGH_US = 4652;
+static const uint32_t HEADER_LOW_US = 2408;
+
+static const uint32_t BIT_HIGH_US = 368;
+static const uint32_t BIT_ONE_LOW_US = 944;
+static const uint32_t BIT_ZERO_LOW_US = 368;
 
 void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
   dst->set_carrier_frequency(38000);
@@ -29,25 +30,26 @@ void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
   dst->mark(BIT_HIGH_US);
 }
 optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
-  YORKData out{
-      .data = 0,
-      .nbits = 0,
-  };
+  YORKData out;
+
+  char buffer[4];
+
   if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
     return {};
 
-  for (out.nbits = 0; out.nbits < 32; out.nbits++) {
-    if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
-      out.data = (out.data << 1) | 1;
-    } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
-      out.data = (out.data << 1) | 0;
-    } else if (out.nbits == 28) {
-      return out;
-    } else {
-      return {};
+  for (uint16_t index = 0; index <= 4; index ++) {
+    for (uint16_t mask = 1UL << 7; mask != 0; mask >>= 1) {
+      if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
+        buffer[index] |= mask;
+      } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
+        buffer[index] &= ~mask;
+      } else {
+        return {};
+      }
     }
   }
 
+  out.data = buffer[2];
   return out;
 }
 void YORKProtocol::dump(const YORKData &data) {
