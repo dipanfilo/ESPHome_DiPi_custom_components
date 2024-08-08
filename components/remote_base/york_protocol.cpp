@@ -40,9 +40,9 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
 
   ESP_LOGI(TAG, "Received YORK: pass heder");
 
-  for (uint16_t index = 0; index <= 4; index ++) {
+  //for (uint16_t index = 0; index <= 4; index ++) {
     out.data = 0;
-    for (uint16_t mask = 1UL << 7; mask != 0; mask >>= 1) {
+    for (uint32_t mask = 1UL << 31; mask != 0; mask >>= 1) {
       if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
         out.data |= mask;
       } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
@@ -52,7 +52,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
       }
     }
     ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", index=%d", out.data, index );
-  }
+  //}
 
   //out.data = buffer[2];
   return out;
