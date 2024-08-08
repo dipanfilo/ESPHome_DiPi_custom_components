@@ -100,8 +100,8 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   void encode(RemoteTransmitData *dst, const YORKData &data) override;
   optional<YORKData> decode(RemoteReceiveData src) override;
   void dump(const YORKData &data) override;
-  <YORKData>void YORKProtocol::SetDataFromBytes(byte byteStream[8]);
-
+    void YORKProtocol::SetDataFromBytes(byte byteStream[8]);
+    
  private:
   
   // Pulse and pause lengths
