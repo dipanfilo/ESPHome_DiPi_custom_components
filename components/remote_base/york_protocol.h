@@ -161,20 +161,20 @@ template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<T
   TEMPLATABLE_VALUE(bool, sleep                 )// = false;
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
-    YORKData data{};
-    data.operationMode = this->operationMode_.value(x...);
-    data.fanMode = this->fanMode_.value(x...);
-    data.currentTime.hour = this->currentTime_hour_.value(x...);
-    data.currentTime.minute = this->currentTime_minute_.value(x...);
-    data.onTimer.hour = this->onTimer_hour_.value(x...);
-    data.onTimer.halfHour = this->onTimer_halfHour_.value(x...);
-    data.onTimer.active = this->onTimer_active_.value(x...);
-    data.offTimer.hour = this->offTimer_hour_.value(x...);
-    data.offTimer.halfHour = this->offTimer_halfHour_.value(x...);
-    data.offTimer.active = this->offTimer_active_.value(x...);
-    data.temperature = this->temperature_.value(x...);
-    data.swing = this->swing_.value(x...);
-    data.sleep = this->sleep_.value(x...);
+    //YORKData data{};
+    settings.operationMode = this->operationMode_.value(x...);
+    settings.fanMode = this->fanMode_.value(x...);
+    settings.currentTime.hour = this->currentTime_hour_.value(x...);
+    settings.currentTime.minute = this->currentTime_minute_.value(x...);
+    settings.onTimer.hour = this->onTimer_hour_.value(x...);
+    settings.onTimer.halfHour = this->onTimer_halfHour_.value(x...);
+    settings.onTimer.active = this->onTimer_active_.value(x...);
+    settings.offTimer.hour = this->offTimer_hour_.value(x...);
+    settings.offTimer.halfHour = this->offTimer_halfHour_.value(x...);
+    settings.offTimer.active = this->offTimer_active_.value(x...);
+    settings.temperature = this->temperature_.value(x...);
+    settings.swing = this->swing_.value(x...);
+    settings.sleep = this->sleep_.value(x...);
     YORKProtocol().encode(dst, data);
   }
 };
