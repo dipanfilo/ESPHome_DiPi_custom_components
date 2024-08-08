@@ -53,7 +53,7 @@ typedef enum {
 // setting of the air conditioner.
 typedef struct {
     // Header
-    const char header = 'h';
+    const char header = 0x16; //Synchronous Idle (SYN) is the ASCII control character
 
     // Operation mode
     operation_mode_t operationMode;
@@ -101,9 +101,8 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   void encode(RemoteTransmitData *dst, const YORKData &data) override;
   optional<YORKData> decode(RemoteReceiveData src) override;
   void dump(const YORKData &data) override;
-  //void YORKProtocol::getDataBytes(bool powerToggle = false);
-  void SetDataFromBytes(YORKData *data, const byte byteStream[8]);
-
+  void setDataFromBytes(YORKData *data, const byte byteStream[8]);
+  void getDataBytes(YORKData *data, bool powerToggle = false)
 
  private:
   

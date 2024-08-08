@@ -6,6 +6,12 @@ namespace remote_base {
 
 static const char *const TAG = "remote.york";
 
+/////////////////////////////////
+//                             //
+// York ECGS01-i Specific Code //
+//                             //
+/////////////////////////////////
+
 static const uint32_t HEADER_HIGH_US = 4652;
 static const uint32_t HEADER_LOW_US = 2408;
 
@@ -17,19 +23,25 @@ static const uint32_t END_PULS = 20340;
 
 void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
   dst->set_carrier_frequency(38000);
-  dst->reserve(2 + data.nbits * 2u);
+  dst->reserve(2 + 64 + 64 + 3);
+  uint8_t recived_data[8];
+
+  recived_data = getDataBytes(&data);
 
   dst->item(HEADER_HIGH_US, HEADER_LOW_US);
 
-  for (uint32_t mask = 1UL << (data.nbits - 1); mask != 0; mask >>= 1) {
-    if (data.data & mask) {
-      dst->item(BIT_HIGH_US, BIT_ONE_LOW_US);
-    } else {
-      dst->item(BIT_HIGH_US, BIT_ZERO_LOW_US);
+  for (uint8_t index = 0; index < 8; index++) {
+    for (uint8_t mask = 1UL; mask != 0; mask <<= 1) {
+      if(recived_data[index] & mask) {
+        dst->item(BIT_HIGH_US, BIT_ONE_LOW_US);
+      } else {
+        item(BIT_HIGH_US, BIT_ZERO_LOW_US);
+      }
     }
   }
 
-  dst->mark(BIT_HIGH_US);
+  dst->item(BIT_HIGH_US, END_PULS);
+  dst->mark(HEADER_HIGH_US);
 }
 optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   YORKData out;
@@ -66,21 +78,21 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   calculated_checksum = selectNibble(calculated_checksum, false);
 
   if(!(recived_checksum == calculated_checksum)) {
-    ESP_LOGI(TAG, "Received YORK data dont have a valid checksum: calc_checksum=0x%08" PRIX32 , calculated_checksum);
+    ESP_LOGI(TAG, "Received YORK data dont have a valid checksum: calc_checksum=0x%08" PRIX8 , calculated_checksum);
+    return {};
   }
 
   out.data  = (((byte) recived_data[0]) << 24)| (((byte) recived_data[1]) << 16)| (((byte) recived_data[2]) << 8)| ((byte) recived_data[3]);
-  //ESP_LOGI(TAG, "Received YORK: data0=0x%08" PRIX32, out.data);
   out.data1 = (((byte) recived_data[4]) << 24)| (((byte) recived_data[5]) << 16)| (((byte) recived_data[6]) << 8)| ((byte) recived_data[7]);
-  //ESP_LOGI(TAG, "Received YORK: data1=0x%08" PRIX32, out.data1);
 
   if (src.expect_item(BIT_HIGH_US, END_PULS)) {
     if (src.expect_mark(HEADER_HIGH_US)) {
-      out.nbits = 1;
+      ESP_LOGI(TAG, "Received YORK data dont have a valid finalpuls");
+      return {};
     }
   }
 
-  SetDataFromBytes(&out, recived_data);
+  setDataFromBytes(&out, recived_data);
 
   return out;
 }
@@ -88,8 +100,8 @@ void YORKProtocol::dump(const YORKData &data) {
   ESP_LOGI(TAG, "Received YORK: data0=0x%08" PRIX32 , data.data);
   ESP_LOGI(TAG, "Received YORK: data1=0x%08" PRIX32 , data.data1);
   ESP_LOGI(TAG, "Received YORK: currentTime=%d:%d", data.currentTime.hour, data.currentTime.minute);
-  ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.offTimer.hour, data.offTimer.halfHour, data.offTimer.active);
-  ESP_LOGI(TAG, "Received YORK: onTime=%d:%d active= %d", data.onTimer.hour, data.onTimer.halfHour, data.onTimer.active);
+  ESP_LOGI(TAG, "Received YORK: offTime=%d:%d active= %d", data.offTimer.hour, data.offTimer.halfHour ? 30 : 0 , data.offTimer.active);
+  ESP_LOGI(TAG, "Received YORK: onTime=%d:%d active= %d", data.onTimer.hour, data.onTimer.halfHour ? 30 : 0, data.onTimer.active);
   ESP_LOGI(TAG, "Received YORK: setpoint=%d", data.temperature);
   ESP_LOGI(TAG, "Received YORK: operationMode=%d", data.operationMode);
   ESP_LOGI(TAG, "Received YORK: fanMode=%d", data.fanMode);
@@ -107,13 +119,13 @@ void YORKProtocol::dump(const YORKData &data) {
  * the auto on and auto off bytes are swapped in position compared to the
  * Daikin DGS01 Remote Controller.
  */
-void YORKProtocol::SetDataFromBytes(YORKData *data, const byte byteStream[8])
+void YORKProtocol::setDataFromBytes(YORKData *data, const byte byteStream[8])
 {
 
     // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
     // representation of the ASCII character 'h' (probably just short for
     // "header")
-    //settings.header = byteStream[0]; 
+    //data->header = byteStream[0]; 
 
     // BYTE 1: right nibble is for operation mode and left nibble is for fan
     // mode
@@ -159,12 +171,101 @@ void YORKProtocol::SetDataFromBytes(YORKData *data, const byte byteStream[8])
 
   }
 
+void YORKProtocol::getDataBytes(YORKData *data, bool powerToggle = false) {
+    static byte byteStream[8];
+    byte tmpByte;
+    int checksum = 0;
 
+    // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
+    // representation of the ASCII character 'Synchronous Idle (SYN)control character' 
+    byteStream[0] = (byte)data->header;
 
+    // BYTE 1: right nibble is for operation mode and left nibble is for fan mode
+    tmpByte = ((byte)data->operationMode);
+    tmpByte |= ((byte)data->fanMode) << 4;
+
+    // Append BYTE 1 to byteStream
+    byteStream[1] = tmpByte;
+
+    // BYTE 2: right nibble is the right digit of current time in minutes (0M)
+    // and left nibble is the left digit of the current time in minutes (M0)
+    tmpByte = (byte)(data->currentTime.minute % 10);
+    tmpByte |= (byte)((data->currentTime.minute / 10) << 4);
+
+    // Append BYTE 2 to byteStream
+    byteStream[2] = tmpByte;
+
+    // BYTE 3: right nibble is the right digit of the current time in hours (0H)
+    // and the left nibble is the left digit of the current time in hours (H0)
+    tmpByte = (byte)(data->currentTime.hour % 10);
+    tmpByte |= (byte)((data->currentTime.hour / 10) << 4);
+
+    // Append BYTE 3 to byteStream
+    byteStream[3] = tmpByte;
+
+    // BYTE 4: right nibble is the right digit of the on timer time in hours
+    // and the first two bits of the left nibble is the left digit of the on
+    // timer time in hours. The third bit of the nibble is 1 when the on
+    // timer time is at half past the hour, else 0. The last bit is 1 only when
+    // the on timer is active
+    tmpByte = (byte)(data->onTimer.hour % 10);
+    tmpByte |= (byte)((data->onTimer.hour / 10) << 4);
+    tmpByte != data->onTimer.halfHour ? 0b01000000 : 0b00000000;
+    tmpByte != data->onTimer.active ? 0b10000000 : 0b00000000;
+
+    // Append BYTE 4 to byteStream
+    byteStream[4] = tmpByte;
+
+    // BYTE 5: right nibble is the right digit of the off timer time in hours
+    // and the first two bits of the left nibble is the left digit of the off
+    // timer time in hours. The third bit of the nibble is 1 when the off
+    // timer time is at half past the hour, else 0. The last bit is 1 only when
+    // the off timer is active
+    tmpByte = (byte)(data->offTimer.hour % 10);
+    tmpByte |= (byte)((data->offTimer.hour / 10) << 4);
+    tmpByte != data->offTimer.halfHour ? 0b01000000 : 0b00000000;
+    tmpByte != data->offTimer.active ? 0b10000000 : 0b00000000;
+
+    // Append BYTE 5 to byteStream
+    byteStream[5] = tmpByte;
+
+    // BYTE 6: Left nibble is the right digit (1s) of the temperature in
+    // Celcius and the right nibble is the left digit (10s) of the temperature
+    // in Celcius
+    tmpByte = (byte)(data->temperature % 10);
+    tmpByte |= (byte)((data->temperature / 10) << 4);
+
+    // Append BYTE 6 to byteStream
+    byteStream[6] = tmpByte;
+
+    // BYTE 7: Left nibble is a concatenation of 4-bits: Louvre Swing On/Off +
+    // Sleep Mode + 1 + Power Toggle. Right nibble is the reverse bit order
+    // checksum of all the reverse bit order nibbles before it.
+    tmpByte = (data->swing ? 0b0001 : 0b0000);  // Louvre Swing On/Off
+    tmpByte |= (data->sleep ? 0b0010 : 0b0000); // Sleep Mode On/Off
+    tmpByte |= 0b0100;                             // This bit is always 1
+    tmpByte |= (powerToggle ? 0b1000 : 0b0000);    // Power toggle bit
+
+    // Append left half of BYTE 7 to byteStream
+    byteStream[7] = tmpByte;
+
+    //calc checksum
+    for (int i = 0; i < 8; i++)
+    {
+        // Add reverse left nibble value
+        checksum += selectNibble(byteStream[i], false);
+        // Add reverse right nibble value
+        if (i < 7) {
+          checksum += selectNibble(byteStream[i], true);
+        }
+    }
+
+    // OR checksum with BYTE 7 of byteStream
+    byteStream[7] |= (byte)(selectNibble(checksum, false) << 4);
+
+    return byteStream;
+}
 
 
 }  // namespace remote_base
 }  // namespace esphome
-
-
-// 134 = 2 + 64 + 64 + 3
