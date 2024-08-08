@@ -59,8 +59,10 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
       out.nbits = 1;
     }
   }
+
+  RawTimings mem = get_data();
   
-  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", nbits=%d", src.data_[133], out.nbits);
+  ESP_LOGI(TAG, "Received YORK: data=0x%08" PRIX32 ", nbits=%d", mem[133], out.nbits);
 
   return out;
 }
