@@ -102,6 +102,7 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   void dump(const YORKData &data) override;
 
  private:
+  void YORKProtocol::SetDataToBytes(byte byteStream[8]);
   // Pulse and pause lengths
   const int pulseLength  = 368; // 368 us pulse
   const int pauseLength0 = -368; // 368 us space

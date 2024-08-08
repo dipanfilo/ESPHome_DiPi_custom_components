@@ -16,11 +16,9 @@ static const char *const TAG = "remote.york";
 void YORKProtocol::setOperationMode(operation_mode_t operationMode) {
     settings.operationMode = operationMode;
 }
-
 void YORKProtocol::setFanMode(fan_mode_t fanMode) {
     settings.fanMode = fanMode;
 }
-
 void YORKProtocol::setTime(time_struct_t currentTime) {
     if (currentTime.hour <= 23 && currentTime.hour >= 0
         && currentTime.minute <= 59 && currentTime.minute >= 0)
@@ -28,7 +26,6 @@ void YORKProtocol::setTime(time_struct_t currentTime) {
         settings.currentTime = currentTime;
     }
 }
-
 void YORKProtocol::setOnTimer(timer_struct_t onTimer) {
     if (onTimer.hour <= 23 && onTimer.hour >= 0
         && (onTimer.halfHour || !onTimer.halfHour))
@@ -36,25 +33,21 @@ void YORKProtocol::setOnTimer(timer_struct_t onTimer) {
         settings.onTimer = onTimer;
     }
 }
-
 void YORKProtocol::setOffTimer(timer_struct_t offTimer) {
     if (offTimer.hour <= 23 && offTimer.hour >= 0)
     {
         settings.offTimer = offTimer;
     }
 }
-
 void YORKProtocol::setTemperature(int temperature) {
     if (temperature >= 16 && temperature <= 30)
     {
         settings.temperature = temperature;
     }
 }
-
 void YORKProtocol::setSleep(bool active) {
     settings.sleep = active;
 }
-
 void YORKProtocol::setSwing(bool active) {
     settings.sleep = active;
 }
@@ -244,29 +237,6 @@ void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
   }
  
 
-}
-
-optional<YORKData> LGProtocol::decode(RemoteReceiveData src) {
-  LGData out{
-      .data = 0,
-      .nbits = 0,
-  };
-  if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
-    return {};
-
-  for (out.nbits = 0; out.nbits < 32; out.nbits++) {
-    if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
-      out.data = (out.data << 1) | 1;
-    } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
-      out.data = (out.data << 1) | 0;
-    } else if (out.nbits == 28) {
-      return out;
-    } else {
-      return {};
-    }
-  }
-
-  return out;
 }
 
 
