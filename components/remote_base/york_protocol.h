@@ -90,7 +90,7 @@ typedef struct {
 
 
     // OLD Data LG Protocol for testing
-    uint32_t data;
+    uint64_t data;
     uint8_t nbits;
 
 } YORKData;
@@ -101,7 +101,7 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   optional<YORKData> decode(RemoteReceiveData src) override;
   void dump(const YORKData &data) override;
   //void YORKProtocol::getDataBytes(bool powerToggle = false);
-  void SetDataFromBytes(const byte &byteStream[8]);
+  void SetDataFromBytes(const byte byteStream[8]);
 
 
  private:
