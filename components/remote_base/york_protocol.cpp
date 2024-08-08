@@ -37,7 +37,9 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   out.data = 0;
   out.nbits = 0;
 
-  uint8_t buffer[8];
+  uint8_t recived_data[8];
+  byte recived_checksum = 0;
+  byte calculated_checksum = 0; 
 
   bool End_OK = false;
 
@@ -47,16 +49,41 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   for (uint8_t index = 0; index < 8; index++) {
     for (uint8_t mask = 1UL << 7; mask != 0; mask >>= 1) {
       if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
-        buffer[index] |= mask;
+        recived_data[index] |= mask;
       } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
-        buffer[index] &= ~mask;
+        recived_data[index] &= ~mask;
       } else {
         return {};
       }
     }
   }
 
-  out.data = (((byte) buffer[0]) << 24) | (((byte) buffer[1]) << 16) | (((byte) buffer[2]) << 8) | (((byte) buffer[3]));
+  recived_checksum = recived_data[7] & 0b00001111;
+
+  //check the recived data checksum
+  for (int i = 0; i < 8; i++)
+  {
+    // Add reverse left nibble value
+    calculated_checksum += reverseNibble(recived_data[i], true);
+    // Add reverse right nibble value
+    if (i < 7)
+      calculated_checksum += reverseNibble(recived_data[i]);
+  }
+  calculated_checksum = reverseNibble(calculated_checksum);
+
+  if(!(recived_checksum = calculated_checksum))
+  {
+    ESP_LOGI(TAG, "Received YORK data are not valid");
+    return {};
+  }
+
+
+
+
+
+
+
+  out.data = (((byte) recived_data[0]) << 24) | (((byte) recived_data[1]) << 16) | (((byte) recived_data[2]) << 8) | (((byte) recived_data[3]));
 
   if (src.expect_item(BIT_HIGH_US, END_PULS)) {
     out.nbits = 1;
