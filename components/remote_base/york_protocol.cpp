@@ -53,6 +53,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
       } else {
         return {};
       }
+      ESP_LOGI(TAG, "Received YORK: loop index=%d data=%d", index, buffer[index]);
     }
   }
 
