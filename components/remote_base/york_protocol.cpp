@@ -26,7 +26,7 @@ void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
   dst->reserve(2 + 64 + 64 + 3);
   uint8_t recived_data[8];
 
-  recived_data = getDataBytes(&data);
+  recived_data = getDataBytes(&data, false);
 
   dst->item(HEADER_HIGH_US, HEADER_LOW_US);
 
@@ -171,7 +171,7 @@ void YORKProtocol::setDataFromBytes(YORKData *data, const byte byteStream[8])
 
   }
 
-void YORKProtocol::getDataBytes(YORKData *data, bool powerToggle = false) {
+void YORKProtocol::getDataBytes(const YORKData *data, bool powerToggle = false) {
     static byte byteStream[8];
     byte tmpByte;
     int checksum = 0;
