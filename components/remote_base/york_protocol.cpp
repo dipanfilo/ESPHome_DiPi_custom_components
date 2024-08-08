@@ -55,8 +55,10 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
 
 
   if (src.expect_item(BIT_HIGH_US, END_PULS)) {
+    out.nbits = 1;
+    ESP_LOGI(TAG, "Received YORK: step 1");
     if (src.expect_mark(HEADER_HIGH_US)) {
-      out.nbits = 1;
+       ESP_LOGI(TAG, "Received YORK: step 2");
     }
   }
 
