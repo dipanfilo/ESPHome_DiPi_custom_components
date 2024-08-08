@@ -151,9 +151,8 @@ void YORKProtocol::SetDataFromBytes(const byte byteStream[8])
     // BYTE 7: Left nibble is a concatenation of 4-bits: Louvre Swing On/Off +
     // Sleep Mode + 1 + Power Toggle. Right nibble is the reverse bit order
     // checksum of all the reverse bit order nibbles before it.
-    byteStream[7] = byteStream[7] >> 4;
-    this->settings.swing = (bool)((byteStream[7] & 0b1000) >> 3); 
-    this->settings.sleep = (bool)((byteStream[7] & 0b0100) >> 2);
+    this->settings.swing = (bool)(((byteStream[7] >> 4) & 0b1000) >> 3); 
+    this->settings.sleep = (bool)(((byteStream[7] >> 4) & 0b0100) >> 2);
   }
 
 
