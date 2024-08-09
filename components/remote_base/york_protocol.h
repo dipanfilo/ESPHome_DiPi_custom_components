@@ -104,26 +104,26 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
 
  protected:
   // Air conditioner settings
-  YORKData settings_;
+  //YORKData settings_;
 };
 
 DECLARE_REMOTE_PROTOCOL(YORK)
 
 template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<Ts...> {
  public:
-  TEMPLATABLE_VALUE(operation_mode_t, operationMode      );// = OPERATION_MODE_COOL;
-  TEMPLATABLE_VALUE(fan_mode_t, fanMode            );// = FAN_MODE_AUTO;
-  TEMPLATABLE_VALUE(uint8_t, currentTime_hour   );// = 0;
-  TEMPLATABLE_VALUE(uint8_t, currentTime_minute );// = 0;
-  TEMPLATABLE_VALUE(uint8_t, onTimer_hour       );// = 0;
-  TEMPLATABLE_VALUE(bool, onTimer_halfHour      );// = true;
-  TEMPLATABLE_VALUE(bool, onTimer_active        );// = false;
-  TEMPLATABLE_VALUE(uint8_t, offTimer_hour      );// = 0;
-  TEMPLATABLE_VALUE(bool, offTimer_halfHour     );// = true;
-  TEMPLATABLE_VALUE(bool, offTimer_active       );// = false;
-  TEMPLATABLE_VALUE(uint8_t, temperature        );// = 28;
-  TEMPLATABLE_VALUE(bool, swing                 );// = true;
-  TEMPLATABLE_VALUE(bool, sleep                 );// = false;
+  TEMPLATABLE_VALUE(operation_mode_t, operationMode)
+  TEMPLATABLE_VALUE(fan_mode_t, fanMode)
+  TEMPLATABLE_VALUE(uint8_t, currentTime_hour)
+  TEMPLATABLE_VALUE(uint8_t, onTimer_hour)
+  TEMPLATABLE_VALUE(uint8_t, currentTime_minute)
+  TEMPLATABLE_VALUE(bool, onTimer_halfHour)
+  TEMPLATABLE_VALUE(bool, onTimer_active)
+  TEMPLATABLE_VALUE(uint8_t, offTimer_hour)
+  TEMPLATABLE_VALUE(bool, offTimer_halfHour)
+  TEMPLATABLE_VALUE(bool, offTimer_active)
+  TEMPLATABLE_VALUE(uint8_t, temperature)
+  TEMPLATABLE_VALUE(bool, swing)
+  TEMPLATABLE_VALUE(bool, sleep)
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
     YORKData data{};
