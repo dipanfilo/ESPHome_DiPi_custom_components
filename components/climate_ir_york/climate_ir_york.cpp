@@ -6,9 +6,7 @@ namespace york {
 
 static const char *const TAG = "york.climate";
 
-
-
-climate::ClimateTraits YorkClimate::traits() {
+climate::ClimateTraits YorkClimate::traits_() {
   auto traits = climate::ClimateTraits();
   traits.set_supports_current_temperature(this->sensor_ != nullptr);
   traits.set_supports_action(false);
@@ -47,7 +45,7 @@ climate::ClimateTraits YorkClimate::traits() {
   return traits;
 }
 
-void YorkClimate::transmit_state() {
+void YorkClimate::transmit_state_() {
 
   switch (this->mode) {
   
@@ -209,9 +207,9 @@ void YorkClimate::transmit_state() {
 
 
 
-bool YorkClimate::parse_state_frame_(const uint8_t frame[]) { return false; }
 
-bool YorkClimate::on_receive(remote_base::RemoteReceiveData data) {
+
+bool YorkClimate::on_receive_(remote_base::RemoteReceiveData data) {
   uint8_t state_frame[18] = {};
 
   if (!data.expect_item(MITSUBISHI_HEADER_MARK, MITSUBISHI_HEADER_SPACE)) {

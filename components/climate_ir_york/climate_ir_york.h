@@ -30,16 +30,12 @@ class YorkClimate : public climate_ir::ClimateIR {
 
  protected:
   // Transmit via IR the state of this climate controller.
-  void transmit_state() override;
+  void transmit_state_() override;
   // Handle received IR Buffer
-  bool on_receive(remote_base::RemoteReceiveData data) override;
-  bool parse_state_frame_(const uint8_t frame[]);
+  bool on_receive_(remote_base::RemoteReceiveData data) override;
+  climate::ClimateTraits traits_() override;
 
-  fan_mode_t fan_mode_;
-
-  VerticalDirection default_vertical_direction_;
-
-  climate::ClimateTraits traits() override;
+  YORKData settings_;
 };
 
 }  // namespace mitsubishi
