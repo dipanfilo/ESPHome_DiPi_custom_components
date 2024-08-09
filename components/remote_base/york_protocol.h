@@ -147,7 +147,7 @@ DECLARE_REMOTE_PROTOCOL(YORK)
 template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<Ts...> {
  public:
   TEMPLATABLE_VALUE(operation_mode_t, operationMode      );// = OPERATION_MODE_COOL;
-  TEMPLATABLE_VALUE(uint8_t, fanMode            );// = FAN_MODE_AUTO;
+  TEMPLATABLE_VALUE(fan_mode_t, fanMode            );// = FAN_MODE_AUTO;
   TEMPLATABLE_VALUE(uint8_t, currentTime_hour   );// = 0;
   TEMPLATABLE_VALUE(uint8_t, currentTime_minute );// = 0;
   TEMPLATABLE_VALUE(uint8_t, onTimer_hour       );// = 0;
@@ -162,7 +162,7 @@ template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<T
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
     //YORKData data{};
-    //settings.operationMode = this->operationMode_.value(x...);
+    settings.operationMode = this->operationMode_.value(x...);
     settings.fanMode = this->fanMode_.value(x...);
     settings.currentTime.hour = this->currentTime_hour_.value(x...);
     settings.currentTime.minute = this->currentTime_minute_.value(x...);
