@@ -264,7 +264,7 @@ void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
 }
 
 // This method takes the left or right nibble and return it to the caller. 
-byte  YORKProtocol::selectNibble(byte nibble, bool leftNibble) {
+byte YORKProtocol::selectNibble(byte nibble, bool leftNibble) {
   if (!leftNibble) {
     return nibble & 0xF;
   }

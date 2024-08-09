@@ -100,7 +100,7 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
  private:
   void setDataFromBytes(YORKData *data, const byte byteStream[8]);
   void getDataBytes(const YORKData *data, byte *byteStream);
-  byte selectNibble(byte nibble, bool leftNibble = false);
+  byte selectNibble(byte nibble, bool leftNibble);
 
  protected:
   // Air conditioner settings
