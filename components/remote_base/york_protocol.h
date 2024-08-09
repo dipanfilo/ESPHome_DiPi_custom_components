@@ -100,6 +100,16 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
  private:
   void setDataFromBytes(YORKData *data, const byte byteStream[8]);
   void getDataBytes(const YORKData *data, byte *byteStream);
+ 
+  void setOperationMode(operation_mode_t operationMode);
+  void setFanMode(fan_mode_t fanMode);
+  void setTime(time_struct_t currentTime);
+  void setOnTimer(timer_struct_t onTimer);
+  void setOffTimer(timer_struct_t offTimer);
+  void setTemperature(int temperature);
+  void setSleep(bool active);
+  void setSwing(bool active);
+ 
   byte selectNibble(byte nibble, bool leftNibble);
 
  protected:

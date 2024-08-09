@@ -263,6 +263,45 @@ void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
     byteStream[7] |= (byte)(selectNibble(checksum, false) << 4);
 }
 
+void YORKProtocol::setOperationMode(YORKData *data, operation_mode_t operationMode) {
+    data->operationMode = operationMode;
+}
+void YORKProtocol::setFanMode(YORKData *data, fan_mode_t fanMode) {
+    data->fanMode = fanMode;
+}
+void YORKProtocol::setTime(YORKData *data, time_struct_t currentTime) {
+    if (currentTime.hour <= 23 && currentTime.hour >= 0
+        && currentTime.minute <= 59 && currentTime.minute >= 0)
+    {
+        data->currentTime = currentTime;
+    }
+}
+void YORKProtocol::setOnTimer(YORKData *data, timer_struct_t onTimer) {
+    if (onTimer.hour <= 23 && onTimer.hour >= 0)
+    {
+        data->onTimer = onTimer;
+    }
+}
+void YORKProtocol::setOffTimer(YORKData *data, timer_struct_t offTimer) {
+    if (offTimer.hour <= 23 && offTimer.hour >= 0)
+    {
+        data->offTimer = offTimer;
+    }
+}
+void YORKProtocol::setTemperature(YORKData *data, int temperature) {
+    if (temperature >= 16 && temperature <= 30)
+    {
+        data->temperature = temperature;
+    }
+}
+void YORKProtocol::setSleep(YORKData *data, bool active) {
+    data->sleep = active;
+}
+void YORKProtocol::setSwing(YORKData *data, bool active) {
+    data->sleep = active;
+}
+
+
 // This method takes the left or right nibble and return it to the caller. 
 byte YORKProtocol::selectNibble(byte nibble, bool leftNibble) {
   if (!leftNibble) {
