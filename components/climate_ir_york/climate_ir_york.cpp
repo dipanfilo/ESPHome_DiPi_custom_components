@@ -1,4 +1,4 @@
-#include "york_ir.h"
+#include "climate_ir_york.h"
 #include "esphome/core/log.h"
 
 namespace esphome {
