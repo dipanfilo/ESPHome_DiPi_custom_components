@@ -161,20 +161,20 @@ template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<T
   TEMPLATABLE_VALUE(bool, sleep                 );// = false;
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
-    settings_.operationMode = this->operationMode_.value(x...);
-    settings_.fanMode = this->fanMode_.value(x...);
-    settings_.currentTime.hour = this->currentTime_hour_.value(x...);
-    settings_.currentTime.minute = this->currentTime_minute_.value(x...);
-    settings_.onTimer.hour = this->onTimer_hour_.value(x...);
-    settings_.onTimer.halfHour = this->onTimer_halfHour_.value(x...);
-    settings_.onTimer.active = this->onTimer_active_.value(x...);
-    settings_.offTimer.hour = this->offTimer_hour_.value(x...);
-    settings_.offTimer.halfHour = this->offTimer_halfHour_.value(x...);
-    settings_.offTimer.active = this->offTimer_active_.value(x...);
-    settings_.temperature = this->temperature_.value(x...);
-    settings_.swing = this->swing_.value(x...);
-    settings_.sleep = this->sleep_.value(x...);
-    YORKProtocol().encode(dst, settings_);
+    this->settings_.operationMode = this->operationMode_.value(x...);
+    this->settings_.fanMode = this->fanMode_.value(x...);
+    this->settings_.currentTime.hour = this->currentTime_hour_.value(x...);
+    this->settings_.currentTime.minute = this->currentTime_minute_.value(x...);
+    this->settings_.onTimer.hour = this->onTimer_hour_.value(x...);
+    this->settings_.onTimer.halfHour = this->onTimer_halfHour_.value(x...);
+    this->settings_.onTimer.active = this->onTimer_active_.value(x...);
+    this->settings_.offTimer.hour = this->offTimer_hour_.value(x...);
+    this->settings_.offTimer.halfHour = this->offTimer_halfHour_.value(x...);
+    this->settings_.offTimer.active = this->offTimer_active_.value(x...);
+    this->settings_.temperature = this->temperature_.value(x...);
+    this->settings_.swing = this->swing_.value(x...);
+    this->settings_.sleep = this->sleep_.value(x...);
+    YORKProtocol().encode(dst, this->settings_);
   }
 };
 
