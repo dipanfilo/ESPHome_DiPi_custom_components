@@ -6,7 +6,7 @@ namespace york {
 
 static const char *const TAG = "york.climate";
 
-climate::ClimateTraits YorkClimate::traits_() {
+climate::ClimateTraits YorkClimate::traits() {
   auto traits = climate::ClimateTraits();
   traits.set_supports_current_temperature(this->sensor_ != nullptr);
   traits.set_supports_action(false);
@@ -41,7 +41,7 @@ climate::ClimateTraits YorkClimate::traits_() {
   return traits;
 }
 
-void YorkClimate::transmit_state_() {
+void YorkClimate::transmit_state() {
 
   //OperationMode
   switch (this->mode) {
@@ -123,24 +123,10 @@ void YorkClimate::transmit_state_() {
   transmit.perform();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-bool YorkClimate::on_receive_(remote_base::RemoteReceiveData data) {
+bool YorkClimate::on_receive(remote_base::RemoteReceiveData data) {
   
   //get data from IR 
   //set data[] to this->setting....
-
 
 
   // On/Off and Mode
