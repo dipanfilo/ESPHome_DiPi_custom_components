@@ -283,7 +283,7 @@ void YORKProtocol::setOnTimer(YORKData *data, uint8_t hour, bool halfhour, bool 
   if (hour <= 23 && hour >= 0) {
     data->onTimer.hour = hour;
     data->onTimer.halfHour = halfhour;
-    data->onTimer.active = active
+    data->onTimer.active = active;
   } else {
     data->onTimer.hour = 0;
     data->onTimer.hour = false;
@@ -294,7 +294,7 @@ void YORKProtocol::setOffTimer(YORKData *data, uint8_t hour, bool halfhour, bool
   if (hour <= 23 && hour >= 0) {
     data->offTimer.hour = hour;
     data->offTimer.halfHour = halfhour;
-    data->offTimer.active = active
+    data->offTimer.active = active;
   } else {
     data->offTimer.hour = 0;
     data->offTimer.hour = false;
