@@ -178,9 +178,9 @@ bool YorkClimate::on_receive(remote_base::RemoteReceiveData data) {
 
   // Vertical Vane
   if(this->settings.getSwing()) {
-    this->swing_mode == climate::CLIMATE_SWING_VERTICAL);
+    this->swing_mode = climate::CLIMATE_SWING_VERTICAL;
   } else {
-    this->swing_mode == climate::CLIMATE_SWING_OFF);
+    this->swing_mode = climate::CLIMATE_SWING_OFF;
   }
 
   this->preset = climate::CLIMATE_PRESET_NONE;
