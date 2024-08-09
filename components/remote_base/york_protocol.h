@@ -52,6 +52,11 @@ typedef enum {
 // The ac_settings_t type is used to define a variable to hold all the current
 // setting of the air conditioner.
 struct YORKData{
+
+    // packege
+    uint32_t data;
+    uint32_t data1;
+
     // Header
     const char header = 0x16; //Synchronous Idle (SYN) is the ASCII control character
 
@@ -84,16 +89,6 @@ struct YORKData{
     // the remote controller power button is pressed. Only the AC knows its own
     // current powered state since the remote controller does not receive
     // feedback from the AC.
-
-
-
-
-
-    // OLD Data LG Protocol for testing
-    uint32_t data;
-    uint32_t data1;
-    uint8_t nbits;
-
 };
 
 class YORKProtocol : public RemoteProtocol<YORKData> {
@@ -101,45 +96,15 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   void encode(RemoteTransmitData *dst, const YORKData &data) override;
   optional<YORKData> decode(RemoteReceiveData src) override;
   void dump(const YORKData &data) override;
+  
+ private:
   void setDataFromBytes(YORKData *data, const byte byteStream[8]);
   void getDataBytes(const YORKData *data, byte *byteStream);
-
- private:
-  
-  // Pulse and pause lengths
-  const int pulseLength  = 368; // 368 us pulse
-  const int pauseLength0 = -368; // 368 us space
-  const int pauseLength1 = -944; // 944 us space
-
-  // The "beginning of transmission" signal consists of the following
-  // pulse/pause pairs
-  const int beginTransmission[6] = {
-      9788, -9676, // 9.788ms pulse, 9.676ms pause
-      9812, -9680, // 9.812ms pulse, 9.680ms pause
-      4652, -2408  // 4.652ms pulse, 2.408ms pause
-  };
-
-  // The "end of transmission" signal consists of the following pulses
-  // and pause
-  const int endTransmission[3] = {
-      368,   // 368us pulse
-      -20340, // 20.34ms pause
-      4624   // 4.624 ms pulse
-  };
-
- 
+  byte selectNibble(byte nibble, bool leftNibble = false);
 
  protected:
   // Air conditioner settings
   YORKData settings_;
-
-  // This method takes the left or right nibble and return it to the caller. 
-  byte selectNibble(byte nibble, bool leftNibble = false) {
-   if (!leftNibble) {
-    return nibble & 0xF;
-   }
-   return nibble >> 4;
-  }
 };
 
 DECLARE_REMOTE_PROTOCOL(YORK)

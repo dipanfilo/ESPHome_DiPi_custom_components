@@ -170,7 +170,6 @@ void YORKProtocol::setDataFromBytes(YORKData *data, const byte byteStream[8])
     data->sleep = (bool)((byteStream[7] & 0b00000010) >> 1);
 
   }
-
 void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
 
     byte tmpByte;
@@ -264,6 +263,13 @@ void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
     byteStream[7] |= (byte)(selectNibble(checksum, false) << 4);
 }
 
+// This method takes the left or right nibble and return it to the caller. 
+byte selectNibble(byte nibble, bool leftNibble = false) {
+  if (!leftNibble) {
+    return nibble & 0xF;
+  }
+  return nibble >> 4;
+}
 
 }  // namespace remote_base
 }  // namespace esphome
