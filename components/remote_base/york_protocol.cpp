@@ -302,17 +302,17 @@ void YORKProtocol::setOffTimer(YORKData *data, uint8_t hour, bool halfhour, bool
   }
 }
 void YORKProtocol::setTemperature(YORKData *data, int temperature) {
-    if (temperature >= 16 && temperature <= 30) {
-      data->temperature = temperature;
-    } else {
-       data->temperature = 24;
-    }
+  if (temperature >= 16 && temperature <= 30) {
+    data->temperature = temperature;
+  } else {
+      data->temperature = 24;
+  }
 }
 void YORKProtocol::setSleep(YORKData *data, bool active) {
-    data->sleep = active;
+  data->sleep = active;
 }
 void YORKProtocol::setSwing(YORKData *data, bool active) {
-    data->sleep = active;
+  data->sleep = active;
 }
 
 
