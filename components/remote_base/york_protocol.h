@@ -97,7 +97,6 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   optional<YORKData> decode(RemoteReceiveData src) override;
   void dump(const YORKData &data) override;
   
- private:
   void setDataFromBytes(YORKData *data, const byte byteStream[8]);
   void getDataBytes(const YORKData *data, byte *byteStream);
  
@@ -111,10 +110,6 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   void setSwing(YORKData *data, bool active);
  
   byte selectNibble(byte nibble, bool leftNibble);
-
- protected:
-  // Air conditioner settings
-  //YORKData settings_;
 };
 
 DECLARE_REMOTE_PROTOCOL(YORK)

@@ -121,146 +121,145 @@ void YORKProtocol::dump(const YORKData &data) {
  */
 void YORKProtocol::setDataFromBytes(YORKData *data, const byte byteStream[8])
 {
+  // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
+  // representation of the ASCII character 'h' (probably just short for
+  // "header")
+  //data->header = byteStream[0]; 
 
-    // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
-    // representation of the ASCII character 'h' (probably just short for
-    // "header")
-    //data->header = byteStream[0]; 
+  // BYTE 1: right nibble is for operation mode and left nibble is for fan
+  // mode
+  data->operationMode = static_cast<operation_mode_t>(byteStream[1] & 0b00001111);
+  data->fanMode = static_cast<fan_mode_t>(byteStream[1] >> 4);
 
-    // BYTE 1: right nibble is for operation mode and left nibble is for fan
-    // mode
-    data->operationMode = static_cast<operation_mode_t>(byteStream[1] & 0b00001111);
-    data->fanMode = static_cast<fan_mode_t>(byteStream[1] >> 4);
+  // BYTE 2: right nibble is the right digit of current time in minutes (0M)
+  // and left nibble is the left digit of the current time in minutes (M0)
+  data->currentTime.minute = ((byteStream[2] >> 4) * 10) + (byteStream[2] & 0b00001111);
 
-    // BYTE 2: right nibble is the right digit of current time in minutes (0M)
-    // and left nibble is the left digit of the current time in minutes (M0)
-    data->currentTime.minute = ((byteStream[2] >> 4) * 10) + (byteStream[2] & 0b00001111);
+  // BYTE 3: right nibble is the right digit of the current time in hours (0H)
+  // and the left nibble is the left digit of the current time in hours (H0)
+  data->currentTime.hour = ((byteStream[3] >> 4) * 10) + (byteStream[3] & 0b00001111);
 
-    // BYTE 3: right nibble is the right digit of the current time in hours (0H)
-    // and the left nibble is the left digit of the current time in hours (H0)
-    data->currentTime.hour = ((byteStream[3] >> 4) * 10) + (byteStream[3] & 0b00001111);
+  // BYTE 4: right nibble is the right digit of the on timer time in hours
+  // and the first two bits of the left nibble is the left digit of the on
+  // timer time in hours. The third bit of the nibble is 1 when the on
+  // timer time is at half past the hour, else 0. The last bit is 1 only when
+  // the on timer is active
+  data->onTimer.hour =          (((byteStream[4] & 0b00110000) >> 4) * 10) + (byteStream[4] & 0b00001111);
+  data->onTimer.halfHour = (bool)((byteStream[4] & 0b01000000) >> 6);
+  data->onTimer.active   = (bool)((byteStream[4] & 0b10000000) >> 7);
 
-    // BYTE 4: right nibble is the right digit of the on timer time in hours
-    // and the first two bits of the left nibble is the left digit of the on
-    // timer time in hours. The third bit of the nibble is 1 when the on
-    // timer time is at half past the hour, else 0. The last bit is 1 only when
-    // the on timer is active
-    data->onTimer.hour =          (((byteStream[4] & 0b00110000) >> 4) * 10) + (byteStream[4] & 0b00001111);
-    data->onTimer.halfHour = (bool)((byteStream[4] & 0b01000000) >> 6);
-    data->onTimer.active   = (bool)((byteStream[4] & 0b10000000) >> 7);
+  // BYTE 5: right nibble is the right digit of the off timer time in hours
+  // and the first two bits of the left nibble is the left digit of the off
+  // timer time in hours. The third bit of the nibble is 1 when the off
+  // timer time is at half past the hour, else 0. The last bit is 1 only when
+  // the off timer is active
+  data->offTimer.hour =          (((byteStream[5] & 0b00110000) >> 4) * 10) + (byteStream[5] & 0b00001111);
+  data->offTimer.halfHour = (bool)((byteStream[5] & 0b01000000) >> 6);
+  data->offTimer.active   = (bool)((byteStream[5] & 0b10000000) >> 7);
+  
+  // BYTE 6: right nibble is the right digit (1s) of the temperature in
+  // Celcius and the left nibble is the left digit (10s) of the temperature
+  // in Celcius
+  data->temperature = ((byteStream[6] >> 4) * 10) + (byteStream[6] & 0b00001111);
+  
+  // BYTE 7: right nibble is a concatenation of 4-bits: Louvre Swing On/Off +
+  // Sleep Mode + 1 + Power Toggle. Left nibble is the reverse bit order
+  // checksum of all the reverse bit order nibbles before it.
+  data->swing = (bool)((byteStream[7] & 0b00000001)); 
+  data->sleep = (bool)((byteStream[7] & 0b00000010) >> 1);
 
-    // BYTE 5: right nibble is the right digit of the off timer time in hours
-    // and the first two bits of the left nibble is the left digit of the off
-    // timer time in hours. The third bit of the nibble is 1 when the off
-    // timer time is at half past the hour, else 0. The last bit is 1 only when
-    // the off timer is active
-    data->offTimer.hour =          (((byteStream[5] & 0b00110000) >> 4) * 10) + (byteStream[5] & 0b00001111);
-    data->offTimer.halfHour = (bool)((byteStream[5] & 0b01000000) >> 6);
-    data->offTimer.active   = (bool)((byteStream[5] & 0b10000000) >> 7);
-    
-    // BYTE 6: right nibble is the right digit (1s) of the temperature in
-    // Celcius and the left nibble is the left digit (10s) of the temperature
-    // in Celcius
-    data->temperature = ((byteStream[6] >> 4) * 10) + (byteStream[6] & 0b00001111);
-    
-    // BYTE 7: right nibble is a concatenation of 4-bits: Louvre Swing On/Off +
-    // Sleep Mode + 1 + Power Toggle. Left nibble is the reverse bit order
-    // checksum of all the reverse bit order nibbles before it.
-    data->swing = (bool)((byteStream[7] & 0b00000001)); 
-    data->sleep = (bool)((byteStream[7] & 0b00000010) >> 1);
-
-  }
+}
 void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
 
-    byte tmpByte;
-    int checksum = 0;
+  byte tmpByte;
+  int checksum = 0;
 
-    // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
-    // representation of the ASCII character 'Synchronous Idle (SYN)control character' 
-    byteStream[0] = (byte)data->header;
+  // BYTE 0: The binary data header is 8 bits long. It seems to be a binary
+  // representation of the ASCII character 'Synchronous Idle (SYN)control character' 
+  byteStream[0] = (byte)data->header;
 
-    // BYTE 1: right nibble is for operation mode and left nibble is for fan mode
-    tmpByte = ((byte)data->operationMode);
-    tmpByte |= ((byte)data->fanMode) << 4;
+  // BYTE 1: right nibble is for operation mode and left nibble is for fan mode
+  tmpByte = ((byte)data->operationMode);
+  tmpByte |= ((byte)data->fanMode) << 4;
 
-    // Append BYTE 1 to byteStream
-    byteStream[1] = tmpByte;
+  // Append BYTE 1 to byteStream
+  byteStream[1] = tmpByte;
 
-    // BYTE 2: right nibble is the right digit of current time in minutes (0M)
-    // and left nibble is the left digit of the current time in minutes (M0)
-    tmpByte = (byte)(data->currentTime.minute % 10);
-    tmpByte |= (byte)((data->currentTime.minute / 10) << 4);
+  // BYTE 2: right nibble is the right digit of current time in minutes (0M)
+  // and left nibble is the left digit of the current time in minutes (M0)
+  tmpByte = (byte)(data->currentTime.minute % 10);
+  tmpByte |= (byte)((data->currentTime.minute / 10) << 4);
 
-    // Append BYTE 2 to byteStream
-    byteStream[2] = tmpByte;
+  // Append BYTE 2 to byteStream
+  byteStream[2] = tmpByte;
 
-    // BYTE 3: right nibble is the right digit of the current time in hours (0H)
-    // and the left nibble is the left digit of the current time in hours (H0)
-    tmpByte = (byte)(data->currentTime.hour % 10);
-    tmpByte |= (byte)((data->currentTime.hour / 10) << 4);
+  // BYTE 3: right nibble is the right digit of the current time in hours (0H)
+  // and the left nibble is the left digit of the current time in hours (H0)
+  tmpByte = (byte)(data->currentTime.hour % 10);
+  tmpByte |= (byte)((data->currentTime.hour / 10) << 4);
 
-    // Append BYTE 3 to byteStream
-    byteStream[3] = tmpByte;
+  // Append BYTE 3 to byteStream
+  byteStream[3] = tmpByte;
 
-    // BYTE 4: right nibble is the right digit of the on timer time in hours
-    // and the first two bits of the left nibble is the left digit of the on
-    // timer time in hours. The third bit of the nibble is 1 when the on
-    // timer time is at half past the hour, else 0. The last bit is 1 only when
-    // the on timer is active
-    tmpByte = (byte)(data->onTimer.hour % 10);
-    tmpByte |= (byte)((data->onTimer.hour / 10) << 4);
-    tmpByte |= data->onTimer.halfHour ? 0b01000000 : 0b00000000;
-    tmpByte |= data->onTimer.active ? 0b10000000 : 0b00000000;
+  // BYTE 4: right nibble is the right digit of the on timer time in hours
+  // and the first two bits of the left nibble is the left digit of the on
+  // timer time in hours. The third bit of the nibble is 1 when the on
+  // timer time is at half past the hour, else 0. The last bit is 1 only when
+  // the on timer is active
+  tmpByte = (byte)(data->onTimer.hour % 10);
+  tmpByte |= (byte)((data->onTimer.hour / 10) << 4);
+  tmpByte |= data->onTimer.halfHour ? 0b01000000 : 0b00000000;
+  tmpByte |= data->onTimer.active ? 0b10000000 : 0b00000000;
 
-    // Append BYTE 4 to byteStream
-    byteStream[4] = tmpByte;
+  // Append BYTE 4 to byteStream
+  byteStream[4] = tmpByte;
 
-    // BYTE 5: right nibble is the right digit of the off timer time in hours
-    // and the first two bits of the left nibble is the left digit of the off
-    // timer time in hours. The third bit of the nibble is 1 when the off
-    // timer time is at half past the hour, else 0. The last bit is 1 only when
-    // the off timer is active
-    tmpByte = (byte)(data->offTimer.hour % 10);
-    tmpByte |= (byte)((data->offTimer.hour / 10) << 4);
-    tmpByte |= data->offTimer.halfHour ? 0b01000000 : 0b00000000;
-    tmpByte |= data->offTimer.active ? 0b10000000 : 0b00000000;
+  // BYTE 5: right nibble is the right digit of the off timer time in hours
+  // and the first two bits of the left nibble is the left digit of the off
+  // timer time in hours. The third bit of the nibble is 1 when the off
+  // timer time is at half past the hour, else 0. The last bit is 1 only when
+  // the off timer is active
+  tmpByte = (byte)(data->offTimer.hour % 10);
+  tmpByte |= (byte)((data->offTimer.hour / 10) << 4);
+  tmpByte |= data->offTimer.halfHour ? 0b01000000 : 0b00000000;
+  tmpByte |= data->offTimer.active ? 0b10000000 : 0b00000000;
 
-    // Append BYTE 5 to byteStream
-    byteStream[5] = tmpByte;
+  // Append BYTE 5 to byteStream
+  byteStream[5] = tmpByte;
 
-    // BYTE 6: Left nibble is the right digit (1s) of the temperature in
-    // Celcius and the right nibble is the left digit (10s) of the temperature
-    // in Celcius
-    tmpByte = (byte)(data->temperature % 10);
-    tmpByte |= (byte)((data->temperature / 10) << 4);
+  // BYTE 6: Left nibble is the right digit (1s) of the temperature in
+  // Celcius and the right nibble is the left digit (10s) of the temperature
+  // in Celcius
+  tmpByte = (byte)(data->temperature % 10);
+  tmpByte |= (byte)((data->temperature / 10) << 4);
 
-    // Append BYTE 6 to byteStream
-    byteStream[6] = tmpByte;
+  // Append BYTE 6 to byteStream
+  byteStream[6] = tmpByte;
 
-    // BYTE 7: Left nibble is a concatenation of 4-bits: Louvre Swing On/Off +
-    // Sleep Mode + 1 + Power Toggle. Right nibble is the reverse bit order
-    // checksum of all the reverse bit order nibbles before it.
-    tmpByte = (data->swing ? 0b0001 : 0b0000);  // Louvre Swing On/Off
-    tmpByte |= (data->sleep ? 0b0010 : 0b0000); // Sleep Mode On/Off
-    tmpByte |= 0b0100;                             // This bit is always 1
-    //tmpByte |= (powerToggle ? 0b1000 : 0b0000);    // Power toggle bit
+  // BYTE 7: Left nibble is a concatenation of 4-bits: Louvre Swing On/Off +
+  // Sleep Mode + 1 + Power Toggle. Right nibble is the reverse bit order
+  // checksum of all the reverse bit order nibbles before it.
+  tmpByte = (data->swing ? 0b0001 : 0b0000);  // Louvre Swing On/Off
+  tmpByte |= (data->sleep ? 0b0010 : 0b0000); // Sleep Mode On/Off
+  tmpByte |= 0b0100;                             // This bit is always 1
+  //tmpByte |= (powerToggle ? 0b1000 : 0b0000);    // Power toggle bit
 
-    // Append left half of BYTE 7 to byteStream
-    byteStream[7] = tmpByte;
+  // Append left half of BYTE 7 to byteStream
+  byteStream[7] = tmpByte;
 
-    //calc checksum
-    for (int i = 0; i < 8; i++)
-    {
-        // Add reverse left nibble value
-        checksum += selectNibble(byteStream[i], false);
-        // Add reverse right nibble value
-        if (i < 7) {
-          checksum += selectNibble(byteStream[i], true);
-        }
-    }
+  //calc checksum
+  for (int i = 0; i < 8; i++)
+  {
+      // Add reverse left nibble value
+      checksum += selectNibble(byteStream[i], false);
+      // Add reverse right nibble value
+      if (i < 7) {
+        checksum += selectNibble(byteStream[i], true);
+      }
+  }
 
-    // OR checksum with BYTE 7 of byteStream
-    byteStream[7] |= (byte)(selectNibble(checksum, false) << 4);
+  // OR checksum with BYTE 7 of byteStream
+  byteStream[7] |= (byte)(selectNibble(checksum, false) << 4);
 }
 
 void YORKProtocol::setOperationMode(YORKData *data, operation_mode_t operationMode) {
@@ -277,7 +276,6 @@ void YORKProtocol::setcurrentTime(YORKData *data, uint8_t hour,  uint8_t minute)
     data->currentTime.hour = 0;
     data->currentTime.minute = 0;
   }
-
 }
 void YORKProtocol::setOnTimer(YORKData *data, uint8_t hour, bool halfhour, bool active) {
   if (hour <= 23 && hour >= 0) {
@@ -315,8 +313,6 @@ void YORKProtocol::setSwing(YORKData *data, bool active) {
   data->sleep = active;
 }
 
-
-// This method takes the left or right nibble and return it to the caller. 
 byte YORKProtocol::selectNibble(byte nibble, bool leftNibble) {
   if (!leftNibble) {
     return nibble & 0xF;
