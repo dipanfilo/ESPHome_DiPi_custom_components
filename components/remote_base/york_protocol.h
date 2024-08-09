@@ -137,7 +137,7 @@ template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<T
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
     YORKData data{};
-    data.operationMode = this->operationMode_.value(x...);
+    setOperationMode(data, this->operationMode_.value(x...);
     data.fanMode = this->fanMode_.value(x...);
     data.currentTime.hour = this->currentTime_hour_.value(x...);
     data.currentTime.minute = this->currentTime_minute_.value(x...);
