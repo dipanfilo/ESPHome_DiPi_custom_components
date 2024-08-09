@@ -243,9 +243,9 @@ class YORKData {
       return data;
     }
 
-    bool is_valid() const {
-      return this->data_[0] == 0x16 &&  (((this->data_[7] & 0b11110000) >> 4) == calc_cs_());
-    }
+    //bool is_valid() const {
+    //  return this->data_[0] == 0x16 &&  (((this->data_[7] & 0b11110000) >> 4) == calc_cs_());
+    //}
 
 
     std::string to_string(uint8_t max_print_bytes = 255) const {

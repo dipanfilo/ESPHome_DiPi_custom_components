@@ -61,7 +61,7 @@ void YorkClimate::transmit_state() {
   }
 
   // Temperature
-  this->settings.setTemperature( (uint8_t)roundf( clamp<float>(this->target_temperature, YARK_TEMP_MIN, YARK_TEMP_MAX)) );
+  this->settings.setTemperature((uint8_t)roundf(this->target_temperature));
 
   // Fan Speed 
   switch (this->fan_mode.value()) {
