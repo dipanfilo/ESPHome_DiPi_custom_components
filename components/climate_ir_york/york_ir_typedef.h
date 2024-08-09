@@ -132,7 +132,7 @@ class YORKData {
       }
     }
     FanMode getFanMode() {
-      return static_cast<OperationMode>(this->data_[1] >> 4);
+      return static_cast<FanMode>(this->data_[1] >> 4);
     } 
   
     // BYTE 2: right nibble is the right digit of current time in minutes (0M)
@@ -166,7 +166,7 @@ class YORKData {
       if (hour <= 23 && hour >= 0) {
         this->data_[4] = (byte)(hour % 10);
         this->data_[4] |= (byte)((hour / 10) << 4);
-        this->data_[4] |= halfHour ? 0b01000000 : 0b00000000;
+        this->data_[4] |= halfhour ? 0b01000000 : 0b00000000;
         this->data_[4] |= active ? 0b10000000 : 0b00000000;
       } else {
         this->data_[4] = 0;
@@ -189,7 +189,7 @@ class YORKData {
       if (hour <= 23 && hour >= 0) {
         this->data_[5] = (byte)(hour % 10);
         this->data_[5] |= (byte)((hour / 10) << 4);
-        this->data_[5] |= halfHour ? 0b01000000 : 0b00000000;
+        this->data_[5] |= halfhour ? 0b01000000 : 0b00000000;
         this->data_[5] |= active ? 0b10000000 : 0b00000000;
       } else {
         this->data_[5] = 0;
@@ -215,7 +215,7 @@ class YORKData {
         this->data_[6] |= (byte)((24 / 10) << 4);
       }
     }
-    unint8_t getTemperature() {
+    uint8_t getTemperature() {
       return ((this->data_[6] >> 4) * 10) + (this->data_[6] & 0b00001111);
     }
 
@@ -244,14 +244,14 @@ class YORKData {
     }
 
     bool is_valid() const {
-      return this->data_[0] == 0x16 &&  (((this->data_[7] & 0b11110000) >> 4) == this->calc_cs_());
+      return this->data_[0] == 0x16 &&  (uint8_t)(((this->data_[7] & 0b11110000) >> 4) == this->calc_cs_());
     }
 
 
     std::string to_string(uint8_t max_print_bytes = 255) const {
       std::string info;
       if (this->is_valid()) {
-        info += str_sprintf("Data: %s", format_hex_pretty(this->getdata_()).c_str());
+        info += str_sprintf("Data: %s", format_hex_pretty(this->getdata()).c_str());
       } else {
         info = "[Invalid]";
       }

@@ -10,7 +10,7 @@ climate::ClimateTraits YorkClimate::traits_() {
   auto traits = climate::ClimateTraits();
   traits.set_supports_current_temperature(this->sensor_ != nullptr);
   traits.set_supports_action(false);
-  traits.set_supports_heat(false);
+  this->set_supports_heat(false);
   traits.set_visual_min_temperature(YORK_TEMP_MIN);
   traits.set_visual_max_temperature(YORK_TEMP_MAX);
   traits.set_visual_temperature_step(1.0f);
@@ -31,11 +31,7 @@ climate::ClimateTraits YorkClimate::traits_() {
 
   // Default to only 3 levels in ESPHome even if most unit supports 4. The 3rd level is not used.
   traits.set_supported_fan_modes(
-      {climate::CLIMATE_FAN_AUTO, climate::CLIMATE_FAN_LOW, climate::CLIMATE_FAN_MEDIUM, climate::CLIMATE_FAN_HIGH});
-  if (this->fan_mode_ == FAN_MODE_QUIET)
-    traits.add_supported_fan_mode(climate::CLIMATE_FAN_QUIET);
-  if (this->fan_mode_ >= FAN_MODE_TURBO)
-    traits.add_supported_fan_mode(climate::CLIMATE_FAN_FOCUS);
+      {climate::CLIMATE_FAN_AUTO, climate::CLIMATE_FAN_LOW, climate::CLIMATE_FAN_MEDIUM, climate::CLIMATE_FAN_HIGH, climate::CLIMATE_FAN_QUIET, climate::CLIMATE_FAN_FOCUS});
 
   traits.set_supported_swing_modes({climate::CLIMATE_SWING_OFF, climate::CLIMATE_SWING_VERTICAL});
 
