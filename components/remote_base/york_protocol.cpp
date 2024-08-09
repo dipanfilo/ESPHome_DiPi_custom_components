@@ -264,34 +264,48 @@ void YORKProtocol::getDataBytes(const YORKData *data, byte *byteStream) {
 }
 
 void YORKProtocol::setOperationMode(YORKData *data, operation_mode_t operationMode) {
-    data->operationMode = operationMode;
+  data->operationMode = operationMode;
 }
 void YORKProtocol::setFanMode(YORKData *data, fan_mode_t fanMode) {
-    data->fanMode = fanMode;
+  data->fanMode = fanMode;
 }
-void YORKProtocol::setTime(YORKData *data, time_struct_t currentTime) {
-    if (currentTime.hour <= 23 && currentTime.hour >= 0
-        && currentTime.minute <= 59 && currentTime.minute >= 0)
-    {
-        data->currentTime = currentTime;
-    }
+void YORKProtocol::setcurrentTime(YORKData *data, uint8_t hour,  uint8_t minute) {
+  if ((hour <= 23 && hour >= 0) && (minute <= 59 && minute >= 0)) {
+    data->currentTime.hour = hour;
+    data->currentTime.minute = minute;
+  } else {
+    data->currentTime.hour = 0;
+    data->currentTime.minute = 0;
+  }
+
 }
-void YORKProtocol::setOnTimer(YORKData *data, timer_struct_t onTimer) {
-    if (onTimer.hour <= 23 && onTimer.hour >= 0)
-    {
-        data->onTimer = onTimer;
-    }
+void YORKProtocol::setOnTimer(YORKData *data, uint8_t hour, bool halfhour, bool active) {
+  if (hour <= 23 && hour >= 0) {
+    data->onTimer.hour = hour;
+    data->onTimer.halfHour = halfhour;
+    data->onTimer.active = active
+  } else {
+    data->onTimer.hour = 0;
+    data->onTimer.hour = false;
+    data->onTimer.active = false;
+  }
 }
-void YORKProtocol::setOffTimer(YORKData *data, timer_struct_t offTimer) {
-    if (offTimer.hour <= 23 && offTimer.hour >= 0)
-    {
-        data->offTimer = offTimer;
-    }
+void YORKProtocol::setOffTimer(YORKData *data, uint8_t hour, bool halfhour, bool active) {
+  if (hour <= 23 && hour >= 0) {
+    data->offTimer.hour = hour;
+    data->offTimer.halfHour = halfhour;
+    data->offTimer.active = active
+  } else {
+    data->offTimer.hour = 0;
+    data->offTimer.hour = false;
+    data->offTimer.active = false;
+  }
 }
 void YORKProtocol::setTemperature(YORKData *data, int temperature) {
-    if (temperature >= 16 && temperature <= 30)
-    {
-        data->temperature = temperature;
+    if (temperature >= 16 && temperature <= 30) {
+      data->temperature = temperature;
+    } else {
+       data->temperature = 24;
     }
 }
 void YORKProtocol::setSleep(YORKData *data, bool active) {

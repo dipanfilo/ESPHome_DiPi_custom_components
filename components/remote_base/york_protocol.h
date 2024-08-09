@@ -103,9 +103,9 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
  
   void setOperationMode(YORKData *data, operation_mode_t operationMode);
   void setFanMode(YORKData *data, fan_mode_t fanMode);
-  void setTime(YORKData *data, time_struct_t currentTime);
-  void setOnTimer(YORKData *data, timer_struct_t onTimer);
-  void setOffTimer(YORKData *data, timer_struct_t offTimer);
+  void setcurrentTime(YORKData *data, uint8_t hour,  uint8_t minute);
+  void setOnTimer(YORKData *data, uint8_t hour, bool halfhour, bool active);
+  void setOffTimer(YORKData *data, uint8_t hour, bool halfhour, bool active);
   void setTemperature(YORKData *data, int temperature);
   void setSleep(YORKData *data, bool active);
   void setSwing(YORKData *data, bool active);
@@ -137,19 +137,14 @@ template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<T
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
     YORKData data{};
-    setOperationMode(data, this->operationMode_.value(x...);
-    data.fanMode = this->fanMode_.value(x...);
-    data.currentTime.hour = this->currentTime_hour_.value(x...);
-    data.currentTime.minute = this->currentTime_minute_.value(x...);
-    data.onTimer.hour = this->onTimer_hour_.value(x...);
-    data.onTimer.halfHour = this->onTimer_halfHour_.value(x...);
-    data.onTimer.active = this->onTimer_active_.value(x...);
-    data.offTimer.hour = this->offTimer_hour_.value(x...);
-    data.offTimer.halfHour = this->offTimer_halfHour_.value(x...);
-    data.offTimer.active = this->offTimer_active_.value(x...);
-    data.temperature = this->temperature_.value(x...);
-    data.swing = this->swing_.value(x...);
-    data.sleep = this->sleep_.value(x...);
+    setOperationMode(data, this->operationMode_.value(x...));
+    setFanMode(data, this->fanMode_.value(x...));
+    setcurrentTime(data,this->currentTime_hour_.value(x...), this->currentTime_minute_.value(x...));
+    setOnTimer(data, this->onTimer_hour_.value(x...), this->onTimer_halfHour_.value(x...), this->onTimer_active_.value(x...));
+    setOffTimer(data, this->offTimer_hour_.value(x...), this->offTimer_halfHour_.value(x...), this->offTimer_active_.value(x...));
+    setTemperature(data, data.temperature = this->temperature_.value(x...));
+    setSleep(data, this->swing_.value(x...));
+    setSwing(data, this->sleep_.value(x...)); 
     YORKProtocol().encode(dst, data);
   }
 };
