@@ -127,15 +127,15 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
       4624   // 4.624 ms pulse
   };
 
-  // Air conditioner settings
-  YORKData settings;
+ 
 
  protected:
+  // Air conditioner settings
+  YORKData settings_;
+
   // This method takes the left or right nibble and return it to the caller. 
-  byte selectNibble(byte nibble, bool leftNibble = false)
-  {
-   if (!leftNibble)
-   {
+  byte selectNibble(byte nibble, bool leftNibble = false) {
+   if (!leftNibble) {
     return nibble & 0xF;
    }
    return nibble >> 4;
@@ -144,7 +144,7 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
 
 DECLARE_REMOTE_PROTOCOL(YORK)
 
-template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<Ts...> {
+template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<Ts...>, public Parented<YORKProtocol> {
  public:
   TEMPLATABLE_VALUE(operation_mode_t, operationMode      );// = OPERATION_MODE_COOL;
   TEMPLATABLE_VALUE(fan_mode_t, fanMode            );// = FAN_MODE_AUTO;
@@ -161,21 +161,20 @@ template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<T
   TEMPLATABLE_VALUE(bool, sleep                 );// = false;
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
-    YORKData data{};
-    data.operationMode = this->operationMode_.value(x...);
-    data.fanMode = this->fanMode_.value(x...);
-    data.currentTime.hour = this->currentTime_hour_.value(x...);
-    data.currentTime.minute = this->currentTime_minute_.value(x...);
-    data.onTimer.hour = this->onTimer_hour_.value(x...);
-    data.onTimer.halfHour = this->onTimer_halfHour_.value(x...);
-    data.onTimer.active = this->onTimer_active_.value(x...);
-    data.offTimer.hour = this->offTimer_hour_.value(x...);
-    data.offTimer.halfHour = this->offTimer_halfHour_.value(x...);
-    data.offTimer.active = this->offTimer_active_.value(x...);
-    data.temperature = this->temperature_.value(x...);
-    data.swing = this->swing_.value(x...);
-    data.sleep = this->sleep_.value(x...);
-    YORKProtocol().encode(dst, data);
+    settings_.operationMode = this->operationMode_.value(x...);
+    settings_.fanMode = this->fanMode_.value(x...);
+    settings_.currentTime.hour = this->currentTime_hour_.value(x...);
+    settings_.currentTime.minute = this->currentTime_minute_.value(x...);
+    settings_.onTimer.hour = this->onTimer_hour_.value(x...);
+    settings_.onTimer.halfHour = this->onTimer_halfHour_.value(x...);
+    settings_.onTimer.active = this->onTimer_active_.value(x...);
+    settings_.offTimer.hour = this->offTimer_hour_.value(x...);
+    settings_.offTimer.halfHour = this->offTimer_halfHour_.value(x...);
+    settings_.offTimer.active = this->offTimer_active_.value(x...);
+    settings_.temperature = this->temperature_.value(x...);
+    settings_.swing = this->swing_.value(x...);
+    settings_.sleep = this->sleep_.value(x...);
+    YORKProtocol().encode(dst, settings_);
   }
 };
 
