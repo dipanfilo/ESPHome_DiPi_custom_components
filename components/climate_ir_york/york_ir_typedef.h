@@ -65,8 +65,7 @@ enum OperationMode {
     OPERATION_MODE_FAN  = 0b0100
 };
 
-// The FanMode type is used to define a variable to hold the fan mode of the
-// AC.
+// The FanMode type is used to define a variable to hold the fan mode of the AC.
 enum FanMode {
     FAN_MODE_AUTO           = 0b0001,
     FAN_MODE_MANUAL_SPEED_3 = 0b0010,

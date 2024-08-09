@@ -17,25 +17,20 @@ class YorkClimate : public climate_ir::ClimateIR {
                               {climate::CLIMATE_PRESET_NONE, climate::CLIMATE_PRESET_ECO, climate::CLIMATE_PRESET_BOOST,climate::CLIMATE_PRESET_SLEEP}) 
                               {}
 
-  void set_supports_cool(bool supports_cool) { this->supports_cool_ = supports_cool; }
-  void set_supports_dry(bool supports_dry) { this->supports_dry_ = supports_dry; }
-  void set_supports_fan_only(bool supports_fan_only) { this->supports_fan_only_ = supports_fan_only; }
-  void set_supports_heat(bool supports_heat) { this->supports_heat_ = supports_heat; }
+   void set_supports_cool(bool supports_cool) { this->supports_cool_ = supports_cool; }
+   void set_supports_dry(bool supports_dry) { this->supports_dry_ = supports_dry; }
+   void set_supports_fan_only(bool supports_fan_only) { this->supports_fan_only_ = supports_fan_only; }
+   void set_supports_heat(bool supports_heat) { this->supports_heat_ = supports_heat; }
 
-  void set_fan_mode(fan_mode_t fan_mode) { this->fan_mode_ = fan_mode; }
-
-  void set_vertical_default(VerticalDirection vertical_direction) {
-    this->default_vertical_direction_ = vertical_direction;
-  }
-
+   YORKData settings;
+ 
+ 
  protected:
   // Transmit via IR the state of this climate controller.
   void transmit_state_() override;
   // Handle received IR Buffer
   bool on_receive_(remote_base::RemoteReceiveData data) override;
   climate::ClimateTraits traits_() override;
-
-  YORKData settings_;
 };
 
 }  // namespace mitsubishi
