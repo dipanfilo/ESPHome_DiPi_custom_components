@@ -248,16 +248,16 @@ class YORKData {
     //}
 
 
-    std::string to_string(uint8_t max_print_bytes = 255) const {
-      std::string info;
-      if (this->is_valid()) {
-        info += str_sprintf("Data: %s", format_hex_pretty(this->getdata()).c_str());
-      } else {
-        info = "[Invalid]";
-      }
-
-      return info;
-    }
+    //std::string to_string(uint8_t max_print_bytes = 255) const {
+    //  std::string info;
+    //  if (this->is_valid()) {
+    //    info += str_sprintf("Data: %s", format_hex_pretty(this->getdata()).c_str());
+    //  } else {
+    //    info = "[Invalid]";
+    //  }
+    //
+    //  return info;
+    //}
 
 
   protected:
