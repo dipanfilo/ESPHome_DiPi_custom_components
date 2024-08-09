@@ -244,7 +244,7 @@ class YORKData {
     }
 
     bool is_valid() const {
-      return this->data_[0] == 0x16 &&  (uint8_t)(((this->data_[7] & 0b11110000) >> 4) == this->calc_cs_());
+      return this->data_[0] == 0x16 &&  (((this->data_[7] & 0b11110000) >> 4) == calc_cs_());
     }
 
 
@@ -262,7 +262,7 @@ class YORKData {
 
   protected:
     std::array<uint8_t, 8> data_;
-    uint8_t calc_cs_() {
+    byte calc_cs_() {
       int checksum = 0;  
       for (int i = 0; i < 8; i++)
       {
