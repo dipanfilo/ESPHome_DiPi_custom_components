@@ -313,5 +313,13 @@ void YORKProtocol::setSwing(YORKData *data, bool active) {
   data->sleep = active;
 }
 
+// This method takes the left or right nibble and return it to the caller. 
+byte YORKProtocol::selectNibble(byte nibble, bool leftNibble) {
+  if (!leftNibble) {
+    return nibble & 0xF;
+  }
+  return nibble >> 4;
+}
+
 }  // namespace remote_base
 }  // namespace esphome
