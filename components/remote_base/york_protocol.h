@@ -102,7 +102,7 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   void getDataBytes(const YORKData *data, byte *byteStream);
  
   void setOperationMode(YORKData *data, operation_mode_t operationMode);
-  void setFanMode(fan_mode_t fanMode);
+  void setFanMode(YORKData *data, fan_mode_t fanMode);
   void setTime(YORKData *data, time_struct_t currentTime);
   void setOnTimer(YORKData *data, timer_struct_t onTimer);
   void setOffTimer(YORKData *data, timer_struct_t offTimer);
