@@ -46,17 +46,17 @@ void YorkClimate::transmit_state() {
   //OperationMode
   switch (this->mode) {
     case climate::CLIMATE_MODE_DRY:
-      this->settings.setOperationMode = OPERATION_MODE_DRY;
+      this->settings.setOperationMode(OPERATION_MODE_DRY);
       break;
     case climate::CLIMATE_MODE_COOL:
-      this->settings.setOperationMode = OPERATION_MODE_COOL;
+      this->settings.setOperationMode(OPERATION_MODE_COOL);
       break;
     case climate::CLIMATE_MODE_FAN_ONLY:
-      this->settings.setOperationMode = OPERATION_MODE_FAN;
+      this->settings.setOperationMode(OPERATION_MODE_FAN);
       break;
     case climate::CLIMATE_MODE_OFF:
     default:
-      this->settings.setOperationMode = OPERATION_MODE_COOL;
+      this->settings.setOperationMode(OPERATION_MODE_COOL);
       break;
   }
 
