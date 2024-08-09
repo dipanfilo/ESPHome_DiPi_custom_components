@@ -313,7 +313,5 @@ void YORKProtocol::setSwing(YORKData *data, bool active) {
   data->sleep = active;
 }
 
-c
-
 }  // namespace remote_base
 }  // namespace esphome
