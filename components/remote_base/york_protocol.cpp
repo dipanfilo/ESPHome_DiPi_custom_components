@@ -313,12 +313,7 @@ void YORKProtocol::setSwing(YORKData *data, bool active) {
   data->sleep = active;
 }
 
-byte YORKProtocol::selectNibble(byte nibble, bool leftNibble) {
-  if (!leftNibble) {
-    return nibble & 0xF;
-  }
-  return nibble >> 4;
-}
+c
 
 }  // namespace remote_base
 }  // namespace esphome
