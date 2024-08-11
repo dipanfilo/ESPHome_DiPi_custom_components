@@ -82,15 +82,17 @@ enum SwingModeVertical {
 };
 
 
-
+struct YORKData {
+ std::array<uint8_t, 8> buffer;
+};
 
 
 // The class YORKData is used to define a variable to hold all the current
 // setting of the air conditioner.
-class YORKData {
+class YORKProtocol {
   public:
     // Constructor
-    YORKData()
+    YORKProtocol()
     {
         // Initialize the settings with default values
         this->setHeader();
@@ -108,31 +110,31 @@ class YORKData {
     // BYTE 0: The binary data header is 8 bits long 0x16. It seems to be a binary
     // representation of the ASCII character 'Synchronous Idle (SYN) control character' 
     void setHeader() { 
-      this->data_[0]  = 0x16;
+      this->IR.buffer[0]  = 0x16;
     }
     
     // BYTE 1: right nibble is for operation mode and left nibble is for fan mode
     void setOperationMode(OperationMode operationMode) {
-      this->data_[1] &= 0b11110000;
+      this->IR.buffer[1] &= 0b11110000;
       if((operationMode == OPERATION_MODE_DRY) || (operationMode == OPERATION_MODE_COOL) || (operationMode == OPERATION_MODE_FAN)) {
-        this->data_[1] |= ((byte) static_cast<OperationMode>(operationMode));
+        this->IR.buffer[1] |= ((uint8_t) static_cast<OperationMode>(operationMode));
       } else {
-        this->data_[1] |= OPERATION_MODE_COOL;
+        this->IR.buffer[1] |= OPERATION_MODE_COOL;
       }
     }
     OperationMode getOperationMode() {
-      return static_cast<OperationMode>(this->data_[1] & 0b00001111);
+      return static_cast<OperationMode>(this->IR.buffer[1] & 0b00001111);
     }
     void setFanMode( FanMode fanMode) {
-      this->data_[1] &= 0b00001111;
+      this->IR.buffer[1] &= 0b00001111;
       if((fanMode == FAN_MODE_AUTO) || (fanMode == FAN_MODE_MANUAL_SPEED_1) || (fanMode == FAN_MODE_MANUAL_SPEED_2) || (fanMode == FAN_MODE_MANUAL_SPEED_3) || (fanMode == FAN_MODE_QUIET) || (fanMode == FAN_MODE_TURBO)) {
-        this->data_[1] |= (byte)((static_cast<FanMode>(fanMode)) << 4 );
+        this->IR.buffer[1] |= (uint8_t)((static_cast<FanMode>(fanMode)) << 4 );
       } else {
-        this->data_[1] |= (byte)(FAN_MODE_AUTO << 4);
+        this->IR.buffer[1] |= (uint8_t)(FAN_MODE_AUTO << 4);
       }
     }
     FanMode getFanMode() {
-      return static_cast<FanMode>(this->data_[1] >> 4);
+      return static_cast<FanMode>(this->IR.buffer[1] >> 4);
     } 
   
     // BYTE 2: right nibble is the right digit of current time in minutes (0M)
@@ -141,19 +143,19 @@ class YORKData {
     // and the left nibble is the left digit of the current time in hours (H0)
     void setcurrentTime( uint8_t hour,  uint8_t minute) {
       if ((hour <= 23 && hour >= 0) && (minute <= 59 && minute >= 0)) {
-        this->data_[2] = (byte)(minute % 10);
-        this->data_[2] |= (byte)((minute / 10) << 4);
-        this->data_[3] = (byte)(hour % 10);
-        this->data_[3] |= (byte)((hour / 10) << 4);
+        this->IR.buffer[2] = (uint8_t)(minute % 10);
+        this->IR.buffer[2] |= (uint8_t)((minute / 10) << 4);
+        this->IR.buffer[3] = (uint8_t)(hour % 10);
+        this->IR.buffer[3] |= (uint8_t)((hour / 10) << 4);
       } else {
-        this->data_[2] = 0;
-        this->data_[3] = 0;
+        this->IR.buffer[2] = 0;
+        this->IR.buffer[3] = 0;
       }
     }
     time_struct_t getcurrentTime() {
       time_struct_t currentTime;
-      currentTime.minute = ((this->data_[2] >> 4) * 10) + (data_[2] & 0b00001111);
-      currentTime.hour = ((this->data_[3] >> 4) * 10) + (data_[3] & 0b00001111);
+      currentTime.minute = ((this->IR.buffer[2] >> 4) * 10) + (data_[2] & 0b00001111);
+      currentTime.hour = ((this->IR.buffer[3] >> 4) * 10) + (data_[3] & 0b00001111);
       return currentTime;
     }
 
@@ -164,19 +166,19 @@ class YORKData {
     // the on timer is active
     void setOnTimer(uint8_t hour, bool halfhour, bool active) {
       if (hour <= 23 && hour >= 0) {
-        this->data_[4] = (byte)(hour % 10);
-        this->data_[4] |= (byte)((hour / 10) << 4);
-        this->data_[4] |= halfhour ? 0b01000000 : 0b00000000;
-        this->data_[4] |= active ? 0b10000000 : 0b00000000;
+        this->IR.buffer[4] = (uint8_t)(hour % 10);
+        this->IR.buffer[4] |= (uint8_t)((hour / 10) << 4);
+        this->IR.buffer[4] |= halfhour ? 0b01000000 : 0b00000000;
+        this->IR.buffer[4] |= active ? 0b10000000 : 0b00000000;
       } else {
-        this->data_[4] = 0;
+        this->IR.buffer[4] = 0;
       }
     }
     timer_struct_t getOnTimer() {
       timer_struct_t onTimer;
-      onTimer.hour =         ((((this->data_[4] & 0b00110000) >> 4) * 10) + (this->data_[4] & 0b00001111));
-      onTimer.halfHour = (bool)((this->data_[4] & 0b01000000) >> 6);
-      onTimer.active   = (bool)((this->data_[4] & 0b10000000) >> 7);
+      onTimer.hour =         ((((this->IR.buffer[4] & 0b00110000) >> 4) * 10) + (this->IR.buffer[4] & 0b00001111));
+      onTimer.halfHour = (bool)((this->IR.buffer[4] & 0b01000000) >> 6);
+      onTimer.active   = (bool)((this->IR.buffer[4] & 0b10000000) >> 7);
       return onTimer;
     }    
     
@@ -187,19 +189,19 @@ class YORKData {
     // the off timer is active
     void setOffTimer(uint8_t hour, bool halfhour, bool active) {
       if (hour <= 23 && hour >= 0) {
-        this->data_[5] = (byte)(hour % 10);
-        this->data_[5] |= (byte)((hour / 10) << 4);
-        this->data_[5] |= halfhour ? 0b01000000 : 0b00000000;
-        this->data_[5] |= active ? 0b10000000 : 0b00000000;
+        this->IR.buffer[5] = (uint8_t)(hour % 10);
+        this->IR.buffer[5] |= (uint8_t)((hour / 10) << 4);
+        this->IR.buffer[5] |= halfhour ? 0b01000000 : 0b00000000;
+        this->IR.buffer[5] |= active ? 0b10000000 : 0b00000000;
       } else {
-        this->data_[5] = 0;
+        this->IR.buffer[5] = 0;
       }
     }
     timer_struct_t getOffTimer() {
       timer_struct_t offTimer;
-      offTimer.hour =         ((((this->data_[5] & 0b00110000) >> 4) * 10) + (this->data_[5] & 0b00001111));
-      offTimer.halfHour = (bool)((this->data_[5] & 0b01000000) >> 6);
-      offTimer.active   = (bool)((this->data_[5] & 0b10000000) >> 7);
+      offTimer.hour =         ((((this->IR.buffer[5] & 0b00110000) >> 4) * 10) + (this->IR.buffer[5] & 0b00001111));
+      offTimer.halfHour = (bool)((this->IR.buffer[5] & 0b01000000) >> 6);
+      offTimer.active   = (bool)((this->IR.buffer[5] & 0b10000000) >> 7);
       return offTimer;
     }
 
@@ -208,47 +210,47 @@ class YORKData {
     // in Celcius
     void setTemperature(int temperature) {
       if((temperature <= YORK_TEMP_MAX && temperature >= YORK_TEMP_MIN)) {
-        this->data_[6] = (byte)(temperature % 10);
-        this->data_[6] |= (byte)((temperature / 10) << 4);
+        this->IR.buffer[6] = (uint8_t)(temperature % 10);
+        this->IR.buffer[6] |= (uint8_t)((temperature / 10) << 4);
       } else {
-        this->data_[6] = (byte)(24 % 10);
-        this->data_[6] |= (byte)((24 / 10) << 4);
+        this->IR.buffer[6] = (uint8_t)(24 % 10);
+        this->IR.buffer[6] |= (uint8_t)((24 / 10) << 4);
       }
     }
     uint8_t getTemperature() {
-      return ((this->data_[6] >> 4) * 10) + (this->data_[6] & 0b00001111);
+      return ((this->IR.buffer[6] >> 4) * 10) + (this->IR.buffer[6] & 0b00001111);
     }
 
     // BYTE 7: right nibble is a concatenation of 4-bits: Louvre Swing On/Off +
     // Sleep Mode + 1 + Power Toggle. Left nibble is the reverse bit order
     // checksum of all the reverse bit order nibbles before it.
     void setSleep(bool active) {
-      this->data_[7] |= (active ? 0b0010 : 0b0000); // Sleep Mode On/Off
+      this->IR.buffer[7] |= (active ? 0b0010 : 0b0000); // Sleep Mode On/Off
     }
     bool getSleep() {
-      return (bool)((this->data_[7] & 0b00000010) >> 1);
+      return (bool)((this->IR.buffer[7] & 0b00000010) >> 1);
     }
     void setSwing(bool active){
-      this->data_[7] = (active ? 0b0001 : 0b0000);  // Louvre Swing On/Off
+      this->IR.buffer[7] = (active ? 0b0001 : 0b0000);  // Louvre Swing On/Off
     }
     bool getSwing() {
-      return (bool)((this->data_[7] & 0b00000001));
+      return (bool)((this->IR.buffer[7] & 0b00000001));
     }
     
 
 
-    const uint8_t *data() const { return this->data_.data(); }
+    const uint8_t *data() const { return this->IR.buffer.data(); }
     std::vector<uint8_t> get_data() const {
-      std::vector<uint8_t> data(this->data_.begin(), this->data_.begin() + 8);
+      std::vector<uint8_t> data(this->IR.buffer.begin(), this->IR.buffer.begin() + 8);
       return data;
     }
 
     //bool is_valid() const {
-    //  return this->data_[0] == 0x16 &&  (((this->data_[7] & 0b11110000) >> 4) == calc_cs_());
+    //  return this->IR.buffer[0] == 0x16 &&  (((this->IR.buffer[7] & 0b11110000) >> 4) == calc_cs_());
     //}
 
 
-    //std::string to_string(uint8_t max_print_bytes = 255) const {
+    //std::string to_string(uint8_t max_print_uint8_ts = 255) const {
     //  std::string info;
     //  if (this->is_valid()) {
     //    info += str_sprintf("Data: %s", format_hex_pretty(this->getdata()).c_str());
@@ -259,28 +261,28 @@ class YORKData {
     //  return info;
     //}
 
+  YORKData IR;
 
-  protected:
-    std::array<uint8_t, 8> data_;
-    byte calc_cs_() {
-      int checksum = 0;  
-      for (int i = 0; i < 8; i++)
-      {
-        // Add reverse left nibble value
-        checksum += selectNibble(this->data_[i], false);
-        // Add reverse right nibble value
-        if (i < 7) { 
-            checksum += selectNibble(this->data_[i], true);
-        } 
-      }
-      return (byte)(selectNibble(checksum, false) << 4);
+  uint8_t calc_cs() {
+    int checksum = 0;  
+    for (int i = 0; i < 8; i++)
+    {
+      // Add reverse left nibble value
+      checksum += selectNibble(this->IR.buffer[i], false);
+      // Add reverse right nibble value
+      if (i < 7) { 
+          checksum += selectNibble(this->IR.buffer[i], true);
+      } 
     }
-    byte selectNibble(byte nibble, bool leftNibble) {
-      if (!leftNibble) {
-        return nibble & 0xF;
-      }
-      return nibble >> 4;
+    return (uint8_t)(selectNibble(checksum, false) << 4);
+  }
+
+  const uint8_t selectNibble(uint8_t nibble, bool leftNibble) {
+    if (!leftNibble) {
+      return nibble & 0xF;
     }
+    return nibble >> 4;
+  }
 };
 
 }  // namespace remote_base
