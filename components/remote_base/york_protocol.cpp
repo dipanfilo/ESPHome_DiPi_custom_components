@@ -89,7 +89,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   return out;
 }
 
-std::string YORKrotocol::format_data_(const std::vector<uint8_t> &data) {
+std::string YORKProtocol::format_data_(const std::vector<uint8_t> &data) {
   std::string out;
   for (uint8_t byte : data) {
     char buf[6];
