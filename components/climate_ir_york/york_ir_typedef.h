@@ -54,29 +54,7 @@ struct timer_struct_t {
     bool active;
 };
 
-// The OperationMode type is used to define a variable to hold the desired
-// operation mode of the AC.
-enum OperationMode {
-    OPERATION_MODE_DRY  = 0b0001,
-    OPERATION_MODE_COOL = 0b0010,
-    OPERATION_MODE_FAN  = 0b0100
-};
 
-// The FanMode type is used to define a variable to hold the fan mode of the AC.
-enum FanMode {
-    FAN_MODE_AUTO           = 0b0001,
-    FAN_MODE_MANUAL_SPEED_3 = 0b0010,
-    FAN_MODE_MANUAL_SPEED_2 = 0b0100,
-    FAN_MODE_MANUAL_SPEED_1 = 0b1000,
-    FAN_MODE_QUIET          = 0b1001,
-    FAN_MODE_TURBO          = 0b0011,
-};
-
-// The SwingModeVertical is used to define a variable to hold the fan mode of the AC.
-enum SwingModeVertical {
-    SWING_MODE_VERTICAL_OFF  = 0b0000,
-    SWING_MODE_VERTICAL_AUTO = 0b0001,
-};
 
 // The class YORKData is used to define a variable to hold all the current
 // setting of the air conditioner.

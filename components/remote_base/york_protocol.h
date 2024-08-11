@@ -13,6 +13,51 @@
 namespace esphome {
 namespace remote_base {
 
+
+// Pulse and pause lengths
+//const int pulseLength  = 368; // 368 us pulse
+//const int pauseLength0 = -368; // 368 us space
+//const int pauseLength1 = -944; // 944 us space
+
+// The "beginning of transmission" signal consists of the following
+// pulse/pause pairs
+//const int beginTransmission[2] = {
+//    4652, -2408  // 4.652ms pulse, 2.408ms pause
+//};
+
+// The "end of transmission" signal consists of the following pulses and pause
+//const int endTransmission[3] = {
+//    368,   // 368us pulse
+//    -20340, // 20.34ms pause
+//    4624   // 4.624 ms pulse
+//};
+
+// BYTE 0: The binary data header is 8 bits long 0x16. It seems to be a binary
+// representation of the ASCII character 'Synchronous Idle (SYN) control character' 
+// BYTE 1: right nibble is for operation mode and left nibble is for fan mode
+// BYTE 2: right nibble is the right digit of current time in minutes (0M)
+// and the left nibble is the left digit of the current time in minutes (M0)
+// BYTE 3: right nibble is the right digit of the current time in hours (0H)
+// and the left nibble is the left digit of the current time in hours (H0)
+// BYTE 4: right nibble is the right digit of the on timer time in hours
+// and the first two bits of the left nibble is the left digit of the on
+// timer time in hours. The third bit of the nibble is 1 when the on
+// timer time is at half past the hour, else 0. The last bit is 1 only when
+// the on timer is active
+// BYTE 5: right nibble is the right digit of the off timer time in hours
+// and the first two bits of the left nibble is the left digit of the off
+// timer time in hours. The third bit of the nibble is 1 when the off
+// timer time is at half past the hour, else 0. The last bit is 1 only when
+// the off timer is active
+// BYTE 6: Left nibble is the right digit (1s) of the temperature in
+// Celcius and the right nibble is the left digit (10s) of the temperature
+// in Celcius
+// BYTE 7: right nibble is a concatenation of 4-bits: Louvre Swing On/Off +
+// Sleep Mode + 1 + Power Toggle. Left nibble is the reverse bit order
+// checksum of all the reverse bit order nibbles before it.
+
+
+
 class YorkData {
  public:
   // Make default
