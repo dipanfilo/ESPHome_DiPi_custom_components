@@ -21,9 +21,7 @@ const int pauseLength1 = -944; // 944 us space
 
 // The "beginning of transmission" signal consists of the following
 // pulse/pause pairs
-const int beginTransmission[6] = {
-    9788, -9676, // 9.788ms pulse, 9.676ms pause
-    9812, -9680, // 9.812ms pulse, 9.680ms pause
+const int beginTransmission[2] = {
     4652, -2408  // 4.652ms pulse, 2.408ms pause
 };
 
@@ -36,7 +34,7 @@ const int endTransmission[3] = {
 };
 
 // Temperature
-const uint8_t YORK_TEMP_MIN = 18;  // Celsius
+const uint8_t YORK_TEMP_MIN = 16;  // Celsius
 const uint8_t YORK_TEMP_MAX = 30;  // Celsius
 
 // The time_struct_t type is used to define a variable for storing the hour and
@@ -232,7 +230,7 @@ class YORKProtocol {
     
 
 
-    const uint8_t *data() const { return this->data_(); }
+    const uint32_t *data() const { return &this->data_; }
     std::vector<uint8_t> get_data() const {
       std::vector<uint8_t> data(this->data_.begin(), this->data_.begin() + 8);
       return data;
