@@ -4,6 +4,7 @@
 #include "esphome/components/climate/climate_mode.h"
 
 
+
 // BYTE 0: The binary data header is 8 bits long 0x16. It seems to be a binary
 // representation of the ASCII character 'Synchronous Idle (SYN) control character' 
 // BYTE 1: right nibble is for operation mode and left nibble is for fan mode
