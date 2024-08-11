@@ -29,7 +29,7 @@ class YorkData {
   uint8_t *data() { return this->data_.data(); }
   const uint8_t *data() const { return this->data_.data(); }
   uint8_t size() const { return this->data_.size(); }
-  bool is_valid() const { return this->data_[OFFSET_CS] == this->calc_cs_(); }
+  bool is_valid() const { return selectLeftNibble(this->data_[OFFSET_CS]) == this->calc_cs_(); }
   void finalize() { this->data_[OFFSET_CS] = this->calc_cs_(); }
   bool is_compliment(const YorkData &rhs) const;
   std::string to_string() const { return format_hex_pretty(this->data_.data(), this->data_.size()); }
