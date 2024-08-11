@@ -1966,42 +1966,34 @@ async def mirage_action(var, config, args):
 
 
 # York
-YORKData, YORKBinarySensor, YORKTrigger, YORKAction, YORKDumper = declare_protocol("YORK")
+YorkData, YorkBinarySensor, YorkTrigger, YorkAction, YorkDumper = declare_protocol(
+    "York"
+)
+YorkAction = ns.class_("YorkAction", RemoteTransmitterActionBase)
 YORK_SCHEMA = cv.Schema(
     {
-        cv.Required(CONF_DATA): cv.All(
-            [cv.Any(cv.hex_uint8_t, cv.uint8_t)],
-            cv.Length(min=0, max=7),
-        ),
+        cv.Required(CONF_CODE): cv.All([cv.hex_uint8_t], cv.Length(min=5, max=5)),
     }
 )
 
 
-@register_binary_sensor("york", YORKBinarySensor, YORK_SCHEMA)
+@register_binary_sensor("york", YorkBinarySensor, YORK_SCHEMA)
 def york_binary_sensor(var, config):
-    if CONF_DATA in config:
-        cg.add(var.set_data(config[CONF_DATA]))
-    cg.add(var.finalize())
+    cg.add(var.set_data(config[CONF_CODE]))
 
 
-@register_trigger("york", YORKTrigger, YORKData)
+@register_trigger("york", YorkTrigger, YorkData)
 def york_trigger(var, config):
     pass
 
 
-@register_dumper("york", YORKDumper)
+@register_dumper("york", YorkDumper)
 def york_dumper(var, config):
     pass
 
 
-@register_action("york", YORKAction, YORK_SCHEMA)
+@register_action("york", YorkAction, YORK_SCHEMA)
 async def york_action(var, config, args):
-    if CONF_DATA in config:
-        data_ = config[CONF_DATA]
-        if cg.is_template(data_):
-            template_ = await cg.templatable(
-                data_, args, cg.std_vector.template(cg.uint8)
-            )
-            cg.add(var.set_data_template(template_))
-        else:
-            cg.add(var.set_data_static(data_))
+    vec_ = cg.std_vector.template(cg.uint8)
+    template_ = await cg.templatable(config[CONF_CODE], args, vec_, vec_)
+    cg.add(var.set_code(template_))
