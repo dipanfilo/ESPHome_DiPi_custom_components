@@ -57,16 +57,13 @@ static bool decode_data(RemoteReceiveData &src, YorkData &dst) {
     for (uint8_t mask = 1UL; mask != 0; mask <<= 1) {
       if (!src.expect_mark(BIT_HIGH_US))
         return false;
-        ESP_LOGI(TAG, "Received Byte: ERROR1");
       if (src.expect_space(BIT_ONE_LOW_US)) {
         data |= mask;
       } else if (!src.expect_space(BIT_ZERO_LOW_US)) {
         return false;
-        ESP_LOGI(TAG, "Received Byte: ERROR2");
       }
     }
     dst[idx] = data;
-    ESP_LOGI(TAG, "Received Byte: 0x%02X", data);
   }
   return true;
 }
