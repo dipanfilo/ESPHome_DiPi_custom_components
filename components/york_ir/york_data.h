@@ -88,7 +88,7 @@ class ControlData : public YorkData {
       this->set_value_(6, (uint8_t)(24 / 10), 0b1111, 4);
     }
   }
-  uint8_t get_temp() const { 
+  float get_temp() const { 
     return ((this->get_value_(6, 0b1111, 4) * 10) + (this->get_value_(6, 0b1111, 0))); 
   }
 
