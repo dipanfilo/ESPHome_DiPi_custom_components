@@ -24,8 +24,8 @@ static const uint32_t END_PULS = 20340;
 uint8_t YorkData::calc_cs_() const {
   uint8_t cs = 0;
   for (uint8_t idx = 0; idx < OFFSET_CS; idx++) {
-       cs += selectRightNibble(this->data_[idx]);
-    if (i < 7)
+    cs += selectRightNibble(this->data_[idx]);
+    if (idx < 7)
       cs += selectLeftNibble(this->data_[idx]);
   }
   return selectRightNibble(cs);
@@ -43,7 +43,7 @@ void YorkProtocol::encode(RemoteTransmitData *dst, const YorkData &src) {
   dst->item(HEADER_HIGH_US, HEADER_LOW_US);
   for (uint8_t idx = 0; idx < 8; idx++) {
     for (uint8_t mask = 1UL; mask != 0; mask <<= 1)
-      dst->item(BIT_MARK_US, (src[idx] & mask) ? BIT_ONE_LOW_US : BIT_ZERO_LOW_US);
+      dst->item(BIT_HIGH_US, (src[idx] & mask) ? BIT_ONE_LOW_US : BIT_ZERO_LOW_US);
   }
 
   dst->item(BIT_HIGH_US, END_PULS);
@@ -68,15 +68,15 @@ static bool decode_data(RemoteReceiveData &src, YorkData &dst) {
   return true;
 }
 
-optional<YorkData> MideaProtocol::decode(RemoteReceiveData src) {
+optional<YorkData> YorkProtocol::decode(RemoteReceiveData src) {
   YorkData out;
   if (src.expect_item(HEADER_HIGH_US, HEADER_LOW_US) && decode_data(src, out) && out.is_valid() &&
-      src.expect_item(BIT_HIGH_US, END_PULS) && src.src.expect_mark(HEADER_HIGH_US))
+      src.expect_item(BIT_HIGH_US, END_PULS) && src.expect_mark(HEADER_HIGH_US))
     return out;
   return {};
 }
 
-void MideaProtocol::dump(const YorkData &data) { ESP_LOGI(TAG, "Received York: %s", data.to_string().c_str()); }
+void YorkProtocol::dump(const YorkData &data) { ESP_LOGI(TAG, "Received York: %s", data.to_string().c_str()); }
 
 }  // namespace remote_base
 }  // namespace esphome
