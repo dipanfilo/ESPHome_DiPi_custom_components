@@ -29,7 +29,7 @@ void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
 
   for (uint8_t index = 0; index < 8; index++) {
     for (uint8_t mask = 1UL; mask != 0; mask <<= 1) {
-      if(data.buffer[index] & mask) {
+      if(data.data[index] & mask) {
         dst->item(BIT_HIGH_US, BIT_ONE_LOW_US);
       } else {
         dst->item(BIT_HIGH_US, BIT_ZERO_LOW_US);
@@ -42,8 +42,6 @@ void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
 }
 optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   YORKData out;
-
- uint8_t recived_data[8];
    
   byte recived_checksum = 0;
   byte calculated_checksum = 0; 
@@ -52,26 +50,28 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
     return {};
 
   for (uint8_t index = 0; index < 8; index++) {
+    uint8_t data = 0;
     for (uint8_t mask = 1UL; mask != 0; mask <<= 1) {
       if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
-        recived_data[index] |= mask;
+        data |= mask;
       } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
-        recived_data[index] &= ~mask;
+        data &= ~mask;
       } else {
         return {};
       }
     }
+    out.data.push_back(data);
   }
 
-  recived_checksum = selectLeftNibble(recived_data[7]);
+  recived_checksum = selectLeftNibble(out.data[7]);
 
   //check the recived data checksum
   for (int i = 0; i < 8; i++) {
     // Add reverse left nibble value
-    calculated_checksum += selectLeftNibble(recived_data[i]);
+    calculated_checksum += selectLeftNibble(out.data[i]);
     // Add reverse right nibble value
     if (i < 7)
-      calculated_checksum += selectRightNibble(recived_data[i]);
+      calculated_checksum += selectRightNibble(out.data[i]);
   }
   calculated_checksum = selectLeftNibble(calculated_checksum);
 
@@ -84,13 +84,24 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
     ESP_LOGI(TAG, "Received YORK data dont have a valid finalpuls");
     //return {};
   }
-
-  out.buffer = recived_data;
   
   return out;
 }
+
+std::string YORKrotocol::format_data_(const std::vector<uint8_t> &data) {
+  std::string out;
+  for (uint8_t byte : data) {
+    char buf[6];
+    sprintf(buf, "0x%02X,", byte);
+    out += buf;
+  }
+  out.pop_back();
+  return out;
+}
+
 void YORKProtocol::dump(const YORKData &data) {
-  ESP_LOGI(TAG, "Received YORK: data0=0x%02", data.buffer[0]);
+  auto data_str = format_data_(data.data);
+  ESP_LOGI(TAG, "Received YORK: data=[%s]", data.address, data_str.c_str());
 }
 
 

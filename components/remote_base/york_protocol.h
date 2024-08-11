@@ -19,7 +19,9 @@ namespace remote_base {
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 struct YORKData {
-  uint8_t buffer[8];
+  std::vector<uint8_t> data;
+
+  bool operator==(const YORKData &rhs) const { return  data == rhs.data; }
 };
 
 class YORKProtocol : public RemoteProtocol<YORKData> {
@@ -28,19 +30,20 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   optional<YORKData> decode(RemoteReceiveData src) override;
   void dump(const YORKData &data) override;
   
+private:
+  std::string format_data_(const std::vector<uint8_t> &data);
 };
 
 DECLARE_REMOTE_PROTOCOL(YORK)
 
 template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<Ts...> {
  public:
-  TEMPLATABLE_VALUE(uint8_t, data)
+  TEMPLATABLE_VALUE(std::vector<uint8_t>, data)
 
+  void set_data(const std::vector<uint8_t> &data) { data_ = data; }
   void encode(RemoteTransmitData *dst, Ts... x) override {
     YORKData data{};
-    
-    data.buffer = this->data.value(x...);
-   
+    data.data = this->data_.value(x...);
     YORKProtocol().encode(dst, data);
   }
 };
