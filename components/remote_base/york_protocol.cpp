@@ -69,15 +69,15 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   //check the recived data checksum
   for (int i = 0; i < 8; i++) {
     // Add reverse left nibble value
-    calculated_checksum += selectLeftNibble(out.data[i]);
+    calculated_checksum += selectRightNibble(out.data[i]);
     // Add reverse right nibble value
     if (i < 7)
-      calculated_checksum += selectRightNibble(out.data[i]);
+      calculated_checksum += selectLeftNibble(out.data[i]);
   }
   calculated_checksum = selectLeftNibble(calculated_checksum);
 
   if(!(recived_checksum == calculated_checksum)) {
-    ESP_LOGI(TAG, "Received YORK data dont have a valid checksum: calc_checksum=0x%08" PRIX8 , calculated_checksum);
+    ESP_LOGI(TAG, "Received YORK data dont have a valid checksum: calc_checksum=0x%1", calculated_checksum);
     return {};
   }
 
