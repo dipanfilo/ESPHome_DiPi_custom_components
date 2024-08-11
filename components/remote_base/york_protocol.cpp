@@ -1,5 +1,6 @@
 #include "york_protocol.h"
 #include "esphome/core/log.h"
+#include <cinttypes>
 
 namespace esphome {
 namespace remote_base {
@@ -101,7 +102,7 @@ std::string YORKrotocol::format_data_(const std::vector<uint8_t> &data) {
 
 void YORKProtocol::dump(const YORKData &data) {
   auto data_str = format_data_(data.data);
-  ESP_LOGI(TAG, "Received YORK: data=[%s]", data.address, data_str.c_str());
+  ESP_LOGI(TAG, "Received YORK: data=[%s]", data_str.c_str());
 }
 
 

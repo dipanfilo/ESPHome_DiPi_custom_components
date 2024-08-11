@@ -1,9 +1,8 @@
 #pragma once
 
-#include "esphome/core/component.h"
 #include "remote_base.h"
 
-#include <cinttypes>
+#include <vector>
 
 
 #define selectLeftNibble(nibble) ((nibble >> 4 ) & 0xF)
@@ -29,7 +28,7 @@ class YORKProtocol : public RemoteProtocol<YORKData> {
   void encode(RemoteTransmitData *dst, const YORKData &data) override;
   optional<YORKData> decode(RemoteReceiveData src) override;
   void dump(const YORKData &data) override;
-  
+
 private:
   std::string format_data_(const std::vector<uint8_t> &data);
 };
