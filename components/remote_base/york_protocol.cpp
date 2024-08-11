@@ -63,7 +63,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
     }
   }
 
-  recived_checksum = electLeftNibble(recived_data[7]);
+  recived_checksum = selectLeftNibble(recived_data[7]);
 
   //check the recived data checksum
   for (int i = 0; i < 8; i++) {
