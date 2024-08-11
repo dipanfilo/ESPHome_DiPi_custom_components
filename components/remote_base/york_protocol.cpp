@@ -67,15 +67,15 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
 
   recived_checksum = selectLeftNibble(out.data[7]);
 
-  ESP_LOGI(TAG, "Received YORK data[0]=0x%02", out.data[0]);
-  ESP_LOGI(TAG, "Received YORK data[1]=0x%02", out.data[1]);
-  ESP_LOGI(TAG, "Received YORK data[2]=0x%02", out.data[2]);
-  ESP_LOGI(TAG, "Received YORK data[3]=0x%02", out.data[3]);
-  ESP_LOGI(TAG, "Received YORK data[4]=0x%02", out.data[4]);
-  ESP_LOGI(TAG, "Received YORK data[5]=0x%02", out.data[5]);
-  ESP_LOGI(TAG, "Received YORK data[6]=0x%02", out.data[6]);
-  ESP_LOGI(TAG, "Received YORK data[7]=0x%02", out.data[7]);
-  ESP_LOGI(TAG, "Received YORK recived checksum=0x%02", recived_checksum);
+  ESP_LOGI(TAG, "Received YORK data[0]=0x%02X", out.data[0]);
+  ESP_LOGI(TAG, "Received YORK data[1]=0x%02X", out.data[1]);
+  ESP_LOGI(TAG, "Received YORK data[2]=0x%02X", out.data[2]);
+  ESP_LOGI(TAG, "Received YORK data[3]=0x%02X", out.data[3]);
+  ESP_LOGI(TAG, "Received YORK data[4]=0x%02X", out.data[4]);
+  ESP_LOGI(TAG, "Received YORK data[5]=0x%02X", out.data[5]);
+  ESP_LOGI(TAG, "Received YORK data[6]=0x%02X", out.data[6]);
+  ESP_LOGI(TAG, "Received YORK data[7]=0x%02X", out.data[7]);
+  ESP_LOGI(TAG, "Received YORK recived checksum=0x%02X", recived_checksum);
   ESP_LOGI(TAG, "Received YORK");
   ESP_LOGI(TAG, "Received YORK");
 
@@ -90,7 +90,7 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
       calculated_checksum += selectLeftNibble(out.data[i]);
 
 
-    ESP_LOGI(TAG, "Received YORK calc checksum=0x%02", calculated_checksum);
+    ESP_LOGI(TAG, "Received YORK calc checksum=0x%02X", calculated_checksum);
 
      if (i < 7)
       calculated_checksum2 += out.data[i];
@@ -98,12 +98,12 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
       calculated_checksum2 += selectRightNibble(out.data[i]);
   }
 
-  ESP_LOGI(TAG, "Received YORK calc checksum2=0x%02", calculated_checksum2);
+  ESP_LOGI(TAG, "Received YORK calc checksum2=0x%02X", calculated_checksum2);
 
   calculated_checksum = selectLeftNibble(calculated_checksum);
 
   if(!(recived_checksum == calculated_checksum)) {
-    ESP_LOGI(TAG, "Received YORK data dont have a valid checksum: calc_checksum=0x%02", calculated_checksum);
+    ESP_LOGI(TAG, "Received YORK data dont have a valid checksum: calc_checksum=0x%02X", calculated_checksum);
     //return {};
   }
 
