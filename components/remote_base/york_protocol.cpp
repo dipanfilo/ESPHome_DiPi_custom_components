@@ -23,7 +23,7 @@ static const uint32_t END_PULS = 20340;
 
 uint8_t YorkData::calc_cs_() const {
   uint8_t cs = 0;
-  for (uint8_t idx = 0; idx < OFFSET_CS; idx++) {
+  for (uint8_t idx = 0; idx =< OFFSET_CS; idx++) {
     cs += selectRightNibble(this->data_[idx]);
     if (idx < 7)
       cs += selectLeftNibble(this->data_[idx]);
