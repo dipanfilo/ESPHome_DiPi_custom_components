@@ -3,7 +3,11 @@
 #include "esphome/components/climate_ir/climate_ir.h"
 #include "york_ir_typedef.h"
 
-#include <cinttypes>
+#include <vector>
+
+
+#define selectLeftNibble(nibble) ((nibble >> 4 ) & 0xF)
+#define selectRightNibble(nibble) (nibble & 0xF)
 
 namespace esphome {
 namespace york {
@@ -21,11 +25,11 @@ class YorkClimate : public climate_ir::ClimateIR {
    void set_supports_dry(bool supports_dry) { this->supports_dry_ = supports_dry; }
    void set_supports_fan_only(bool supports_fan_only) { this->supports_fan_only_ = supports_fan_only; }
    void set_supports_heat(bool supports_heat) { this->supports_heat_ = supports_heat; }
-
-   YORKData settings;
  
  
  protected:
+  std::vector<uint8_t> data_;
+  
   // Transmit via IR the state of this climate controller.
   void transmit_state() override;
   // Handle received IR Buffer

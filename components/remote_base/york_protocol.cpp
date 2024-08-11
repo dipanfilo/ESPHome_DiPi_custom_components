@@ -66,8 +66,6 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   }
 
   recived_checksum = selectLeftNibble(out.data[7]);
-
-  //check the recived data checksum
   for (int i = 0; i < 8; i++) {
     // Add reverse right nibble value
     calculated_checksum += selectRightNibble(out.data[i]);
@@ -75,7 +73,6 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
     if (i < 7)
       calculated_checksum += selectLeftNibble(out.data[i]);
   }
-
   calculated_checksum = selectRightNibble(calculated_checksum);
 
   if(!(recived_checksum == calculated_checksum)) {
