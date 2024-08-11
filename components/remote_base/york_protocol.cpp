@@ -43,7 +43,7 @@ void YORKProtocol::encode(RemoteTransmitData *dst, const YORKData &data) {
 optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   YORKData out;
 
-  std::array<uint8_t, 8> recived_data;
+ uint8_t recived_data[8];
    
   byte recived_checksum = 0;
   byte calculated_checksum = 0; 

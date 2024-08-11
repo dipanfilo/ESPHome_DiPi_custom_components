@@ -19,7 +19,7 @@ namespace remote_base {
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 struct YORKData {
- std::array<uint8_t, 8> buffer;
+  uint8_t buffer[8];
 };
 
 class YORKProtocol : public RemoteProtocol<YORKData> {
@@ -34,7 +34,7 @@ DECLARE_REMOTE_PROTOCOL(YORK)
 
 template<typename... Ts> class YORKAction : public RemoteTransmitterActionBase<Ts...> {
  public:
-  TEMPLATABLE_VALUE(std::array<uint8_t, 8>, data)
+  TEMPLATABLE_VALUE(uint8_t, data)
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
     YORKData data{};
