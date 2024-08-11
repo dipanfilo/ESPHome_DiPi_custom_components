@@ -1,10 +1,14 @@
 #pragma once
 
 #include "esphome/core/component.h"
-#include "../climate_ir_york/york_ir_typedef.h"
 #include "remote_base.h"
 
 #include <cinttypes>
+
+
+#define selectLeftNibble(nibble) ((nibble >> 4 ) & 0xF)
+#define selectRightNibble(nibble) (nibble & 0xF)
+
 
 namespace esphome {
 namespace remote_base {
@@ -14,7 +18,9 @@ namespace remote_base {
 // take a look to ABBWelcomeData class maybe adjustit like this one whit set and get functions
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+struct YORKData {
+ std::array<uint8_t, 8> buffer;
+};
 
 class YORKProtocol : public RemoteProtocol<YORKData> {
  public:

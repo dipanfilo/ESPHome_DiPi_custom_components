@@ -63,17 +63,17 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
     }
   }
 
-  recived_checksum = ((recived_data[7] & 0b11110000) >> 4) ;
+  recived_checksum = electLeftNibble(recived_data[7]);
 
   //check the recived data checksum
-  //for (int i = 0; i < 8; i++) {
-  //  // Add reverse left nibble value
-  //  calculated_checksum += selectNibble(recived_data[i], false);
-  //  // Add reverse right nibble value
-  //  if (i < 7)
-  //    calculated_checksum += selectNibble(recived_data[i], true);
-  //}
-  //calculated_checksum = selectNibble(calculated_checksum, false);
+  for (int i = 0; i < 8; i++) {
+    // Add reverse left nibble value
+    calculated_checksum += selectLeftNibble(recived_data[i]);
+    // Add reverse right nibble value
+    if (i < 7)
+      calculated_checksum += selectRightNibble(recived_data[i]);
+  }
+  calculated_checksum = selectLeftNibble(calculated_checksum);
 
   if(!(recived_checksum == calculated_checksum)) {
     ESP_LOGI(TAG, "Received YORK data dont have a valid checksum: calc_checksum=0x%08" PRIX8 , calculated_checksum);
@@ -81,8 +81,8 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
   }
 
   if ((!src.expect_item(BIT_HIGH_US, END_PULS)) || (!src.expect_mark(HEADER_HIGH_US))) {
-     ESP_LOGI(TAG, "Received YORK data dont have a valid finalpuls");
-    return {};
+    ESP_LOGI(TAG, "Received YORK data dont have a valid finalpuls");
+    //return {};
   }
 
   out.buffer = recived_data;
@@ -91,8 +91,6 @@ optional<YORKData> YORKProtocol::decode(RemoteReceiveData src) {
 }
 void YORKProtocol::dump(const YORKData &data) {
   ESP_LOGI(TAG, "Received YORK: data0=0x%02", data.buffer[0]);
-  //ESP_LOGI(TAG, "Received YORK: data1=0x%08" PRIX32 , data.data1);
-  //ESP_LOGI(TAG, "Received YORK: currentTime=%d:%d", data.getcurrentTime().hour, data.getcurrentTime().minute);
 }
 
 
