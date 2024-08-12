@@ -85,7 +85,7 @@ ClimateFanMode ControlData::get_fan_mode() const {
 
 void YorkIR::control(const climate::ClimateCall &call) {
 
-  /* 
+  
   // swing and preset resets after unit powered off
   if (call.get_mode() == climate::CLIMATE_MODE_OFF) {
     this->swing_mode = climate::CLIMATE_SWING_OFF;
@@ -93,7 +93,7 @@ void YorkIR::control(const climate::ClimateCall &call) {
   } 
   
   
-  
+  /* 
   
   else if (call.get_swing_mode().has_value() && ((*call.get_swing_mode() == climate::CLIMATE_SWING_OFF && this->swing_mode == climate::CLIMATE_SWING_VERTICAL) ||
                                                    (*call.get_swing_mode() == climate::CLIMATE_SWING_VERTICAL && this->swing_mode == climate::CLIMATE_SWING_OFF))) {
@@ -104,14 +104,16 @@ void YorkIR::control(const climate::ClimateCall &call) {
 
   }
 
-  */
+ 
  climate_ir::ClimateIR::control(call);
+
+  */
 }
 
 
 
 void YorkIR::transmit_(YorkData &data) {
-  data.finalize();
+  //data.finalize();
   ESP_LOGV(TAG, "Encode York IR data: %s", data.to_string().c_str());
   auto transmit = this->transmitter_->transmit();
   transmit.perform();
