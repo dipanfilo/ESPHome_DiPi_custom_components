@@ -128,8 +128,10 @@ void YorkIR::transmit_state() {
 
 bool YorkIR::on_receive(remote_base::RemoteReceiveData data) {
   auto york = remote_base::YorkProtocol().decode(data);
-  if (york.has_value())
+  if (york.has_value()) {
     return this->on_york_(*york);
+  }
+  return false;
 }
 
 bool YorkIR::on_york_(const YorkData &data) {
