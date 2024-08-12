@@ -104,10 +104,10 @@ void YorkIR::control(const climate::ClimateCall &call) {
 
   }
 
- 
- climate_ir::ClimateIR::control(call);
+ */
 
-  */
+ climate_ir::ClimateIR::control(call);
+  
 }
 
 
