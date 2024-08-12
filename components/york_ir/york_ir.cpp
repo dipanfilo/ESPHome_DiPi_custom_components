@@ -12,11 +12,11 @@ void ControlData::set_temp(float temp) {
 
   temp = esphome::clamp<float>(temp, YORK_TEMPC_MIN, YORK_TEMPC_MAX);
   
-  this->set_temp(temp);
+  this->set_IR_temp(temp);
 }
 
 float ControlData::get_temp() const {
-  return static_cast<float>(this->get_temp());
+  return static_cast<float>(this->get_IR_temp());
 }
 
 void ControlData::set_mode(ClimateMode mode) {
