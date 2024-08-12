@@ -53,8 +53,6 @@ class ControlData : public YorkData {
   void set_fan_mode(ClimateFanMode mode);
   ClimateFanMode get_fan_mode() const;
 
-  void fix();
-
  protected:
   enum Mode : uint8_t {
     MODE_COOL = 0b0010,

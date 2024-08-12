@@ -107,7 +107,8 @@ void YorkIR::control(const climate::ClimateCall &call) {
 }
 
 
-void YorkIR::transmit_(YokrData &data) {
+
+void YorkIR::transmit_(YorkData &data) {
   data.finalize();
   auto transmit = this->transmitter_->transmit();
   remote_base::YorkProtocol().encode(transmit.get_data(), data);
