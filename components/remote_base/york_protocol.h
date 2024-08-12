@@ -75,7 +75,10 @@ class YorkData {
   const uint8_t *data() const { return this->data_.data(); }
   uint8_t size() const { return this->data_.size(); }
   bool is_valid() const { return selectLeftNibble(this->data_[OFFSET_CS]) == this->calc_cs_(); }
-  void finalize() { this->data_[OFFSET_CS] = this->calc_cs_(); }
+  void finalize() { 
+    this->data_[OFFSET_HADDER] = 0x16; //hedder
+    set_value_(OFFSET_CS, this->calc_cs_(), 0b1111, 4); 
+  }
   bool is_compliment(const YorkData &rhs) const;
   std::string to_string() const { return format_hex_pretty(this->data_.data(), this->data_.size()); }
   // compare only 40-bits
@@ -96,6 +99,7 @@ class YorkData {
   }
   void set_mask_(uint8_t idx, bool state, uint8_t mask = 255) { this->set_value_(idx, state ? mask : 0, mask); }
   static const uint8_t OFFSET_CS = 7;
+  static const uint8_t OFFSET_HADDER = 0;
   // 64-bits data
   std::array<uint8_t, 8> data_;
   // Calculate checksum

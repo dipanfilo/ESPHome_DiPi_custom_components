@@ -120,7 +120,7 @@ void YorkIR::transmit_state() {
   data.set_temp(this->target_temperature);
   data.set_mode(this->mode);
   data.set_fan_mode(this->fan_mode.value_or(ClimateFanMode::CLIMATE_FAN_AUTO));
-  
+  data.finalize();
   this->transmit_(data);
 }
 
