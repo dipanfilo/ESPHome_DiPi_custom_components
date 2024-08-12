@@ -111,6 +111,7 @@ void YorkIR::control(const climate::ClimateCall &call) {
 void YorkIR::transmit_(YorkData &data) {
   data.finalize();
   auto transmit = this->transmitter_->transmit();
+  ESP_LOGI(TAG, "Clime Transmit York: %s", data.to_string().c_str());
   remote_base::YorkProtocol().encode(transmit.get_data(), data);
   transmit.perform();
 }
