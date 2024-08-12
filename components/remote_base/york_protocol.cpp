@@ -40,6 +40,7 @@ bool YorkData::is_compliment(const YorkData &rhs) const {
 void YorkProtocol::encode(RemoteTransmitData *dst, const YorkData &src) {
   dst->set_carrier_frequency(38000);
   dst->reserve(2 + 64 + 64 + 3);
+  SP_LOGI(TAG, "Transmit York: %s", src.to_string().c_str();
   dst->item(HEADER_HIGH_US, HEADER_LOW_US);
   for (uint8_t idx = 0; idx < 8; idx++) {
     for (uint8_t mask = 1UL; mask != 0; mask <<= 1)
