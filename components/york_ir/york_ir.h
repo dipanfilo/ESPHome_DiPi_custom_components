@@ -17,7 +17,7 @@ class YorkIR : public climate_ir::ClimateIR {
             {climate::CLIMATE_PRESET_NONE, climate::CLIMATE_PRESET_SLEEP, climate::CLIMATE_PRESET_BOOST}) {}
 
   /// Override control to change settings of the climate device.
-  void control(const climate::ClimateCall &call) override;
+//  void control(const climate::ClimateCall &call) override;
 
  protected:
 
