@@ -85,7 +85,8 @@ ClimateFanMode ControlData::get_fan_mode() const {
 
 
 void YorkIR::control(const climate::ClimateCall &call) {
-  
+
+  this->set_supports_heat(false);
   
   // swing and preset resets after unit powered off
   if (call.get_mode() == climate::CLIMATE_MODE_OFF) {
