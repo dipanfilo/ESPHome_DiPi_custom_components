@@ -131,7 +131,7 @@ bool YorkIR::on_receive(remote_base::RemoteReceiveData data) {
   if (york.has_value()) {
     return this->on_york_(*york);
   }
-  return false;
+  return true;
 }
 
 bool YorkIR::on_york_(const YorkData &data) {

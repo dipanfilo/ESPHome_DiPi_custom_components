@@ -29,6 +29,9 @@
 // Sleep Mode + 1 + Power Toggle. Left nibble is the reverse bit order
 // checksum of all the reverse bit order nibbles before it.
 
+// Temperature
+const uint8_t YORK_TEMPC_MIN = 16;  // Celsius
+const uint8_t YORK_TEMPC_MAX = 30;  // Celsius
 
 namespace esphome {
 namespace york_ir {
@@ -85,7 +88,7 @@ class ControlData : public YorkData {
 
   void set_IR_temp(uint8_t val) { 
 
-    if((val <= MAX_TEMP && val >= MIN_TEMP)) {
+    if((val <= YORK_TEMPC_MAX && val >= YORK_TEMPC_MIN)) {
       this->set_value_(6, (uint8_t)(val % 10), 0b1111, 0);
       this->set_value_(6, (uint8_t)(val / 10), 0b1111, 4);
     } else {
@@ -103,10 +106,6 @@ class ControlData : public YorkData {
   bool get_IR_power_() const { 
     return this->get_value_(7, 0b1, 7); 
   }
-
-
-  static const uint8_t MAX_TEMP = 30;
-  static const uint8_t MIN_TEMP = 16;
 
   static const uint8_t VSWING_OFF = 0;
   static const uint8_t VSWING_AUTO = 1;

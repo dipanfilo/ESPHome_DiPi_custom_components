@@ -6,10 +6,6 @@
 namespace esphome {
 namespace york_ir {
 
-// Temperature
-const uint8_t YORK_TEMPC_MIN = 16;  // Celsius
-const uint8_t YORK_TEMPC_MAX = 30;  // Celsius
-
 
 class YorkIR : public climate_ir::ClimateIR {
  public:
@@ -24,6 +20,7 @@ class YorkIR : public climate_ir::ClimateIR {
   void control(const climate::ClimateCall &call) override;
 
  protected:
+
   /// Transmit via IR the state of this climate controller.
   void transmit_state() override;
   void transmit_(YorkData &data);
