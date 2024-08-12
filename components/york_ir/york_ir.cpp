@@ -118,7 +118,7 @@ void YorkIR::transmit_state() {
   ControlData data;
   data.set_temp(this->target_temperature);
   data.set_mode(this->mode);
-  data.set_IR_fan_mode(this->fan_mode.value_or(ClimateFanMode::CLIMATE_FAN_AUTO));
+  data.set_fan_mode(this->fan_mode.value_or(ClimateFanMode::CLIMATE_FAN_AUTO));
   data.set_sleep_preset(this->preset == climate::CLIMATE_PRESET_SLEEP);
   this->transmit_(data);
 }
@@ -140,9 +140,7 @@ bool YorkIR::on_york_(const YorkData &data) {
   this->mode = status.get_mode();
   this->fan_mode = status.get_fan_mode();
 
-  if (status.get_sleep_preset()) {
-    this->preset = climate::CLIMATE_PRESET_SLEEP;
-  } else if (this->preset == climate::CLIMATE_PRESET_SLEEP) {
+  if (this->preset == climate::CLIMATE_PRESET_SLEEP) {
     this->preset = climate::CLIMATE_PRESET_NONE;
   }
   
