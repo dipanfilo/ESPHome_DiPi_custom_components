@@ -70,6 +70,24 @@ class ControlData : public YorkData {
     FAN_QUIET = 0b1001,
     FAN_TURBO = 0b0011,
   };
+  
+  // The time_struct_t type is used to define a variable for storing the hour and
+  // minute of the current time. This will be used to send the date/time to the
+  // AC indoor unit.
+  struct time_struct_t {
+    unsigned int hour;
+    unsigned int minute;
+  };
+
+  // The timer_struct_t type is used to define a variable to hold the auto on/off
+  // data to send to the AC indoor unit. As with the remote controller, you can
+  // only define a time with 30 minute increments.
+  struct timer_struct_t {
+    unsigned int hour;
+    bool halfHour;
+    bool active;
+  };
+
 
 
   void set_IR_mode_(Mode mode) { 
@@ -104,9 +122,80 @@ class ControlData : public YorkData {
     this->set_value_(7, value, 0b1, 7); 
   }
   bool get_IR_power_() const { 
-    return this->get_value_(7, 0b1, 7); 
+    return this->get_value_(7, 0b0001, 7); 
   }
 
+  void set_IR_currentTime( uint8_t hour,  uint8_t minute) {
+    if ((hour <= 24 && hour >= 0) && (minute <= 59 && minute >= 0)) {
+      this->set_value_(2, (uint8_t)(minute % 10), 0b1111, 0);
+      this->set_value_(2, (uint8_t)(minute / 10), 0b1111, 4);
+
+      this->set_value_(3, (uint8_t)(hour % 10), 0b1111, 0);
+      this->set_value_(3, (uint8_t)(hour / 10), 0b1111, 4);
+    } else {
+      this->set_value_(2, 0, 0);
+      this->set_value_(3, 0, 0);
+    }
+  }
+  time_struct_t get_IR_currentTime() {
+    time_struct_t currentTime;
+    currentTime.minute = ((this->get_value_(2, 0b1111, 4) * 10) + (this->get_value_(2, 0b1111, 0)));
+    currentTime.hour = ((this->get_value_(3, 0b1111, 4) * 10) + (this->get_value_(3, 0b1111, 0))); 
+    return currentTime;
+  }
+ 
+  void set_IR_OnTimer(uint8_t hour, bool halfhour, bool active) {
+    if (hour <= 24 && hour >= 0) {
+      this->set_value_(4, (uint8_t)(hour % 10), 0b1111, 0);
+      this->set_value_(4, (uint8_t)(hour / 10), 0b0011, 4);
+      this->set_value_(4, halfhour, 0b0001, 6);
+      this->set_value_(4, active, 0b0001, 7);
+    } else {
+      this->set_value_(4, 0, 0);
+    }
+  }
+  timer_struct_t get_IR_OnTimer() {
+    timer_struct_t onTimer;
+    onTimer.hour =          ((this->get_value_(4, 0b0011, 4) * 10) + (this->get_value_(4, 0b1111, 0)));
+    onTimer.halfHour = (bool)(this->get_value_(4, 0b0001, 6));
+    onTimer.active   = (bool)(this->get_value_(4, 0b0001, 7));
+    return onTimer;
+  }    
+
+  void set_IR_OffTimer(uint8_t hour, bool halfhour, bool active) {
+    if (hour <= 24 && hour >= 0) {
+      this->set_value_(5, (uint8_t)(hour % 10), 0b1111, 0);
+      this->set_value_(5, (uint8_t)(hour / 10), 0b0011, 4);
+      this->set_value_(5, halfhour, 0b0001, 6);
+      this->set_value_(5, active, 0b0001, 7);
+    } else {
+      this->set_value_(5, 0, 0);
+    }
+  }
+  timer_struct_t get_IR_OffTimer() {
+    timer_struct_t onTimer;
+    onTimer.hour =          ((this->get_value_(5, 0b0011, 4) * 10) + (this->get_value_(4, 0b1111, 0)));
+    onTimer.halfHour = (bool)(this->get_value_(5, 0b0001, 6));
+    onTimer.active   = (bool)(this->get_value_(5, 0b0001, 7));
+    return onTimer;
+  }   
+ 
+  void set_IR_Sleep(bool active) {
+    this->set_value_(7, active, 0b0001, 1);
+  }
+  bool get_IR_Sleep() {
+    return (bool)(this->get_value_(7, 0b0001, 1));
+  }
+
+  void set_IR_Swing(bool active){
+    this->set_value_(7, active, 0b0001, 0);
+  }
+  bool get_IR_Swing() {
+    return (bool)(this->get_value_(7, 0b0001, 0));
+  }
+    
+ 
+ 
   static const uint8_t VSWING_OFF = 0;
   static const uint8_t VSWING_AUTO = 1;
   
