@@ -1,19 +1,19 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import climate_ir
-from esphome.const import CONF_ID, CONF_USE_FAHRENHEIT
+from esphome.const import CONF_ID
 
 AUTO_LOAD = ["climate_ir"]
 CODEOWNERS = ["@panwil"]
 
-midea_ir_ns = cg.esphome_ns.namespace("york_ir")
-MideaIR = midea_ir_ns.class_("YorkIR", climate_ir.ClimateIR)
+york_ir_ns = cg.esphome_ns.namespace("york_ir")
+YorkIR = york_ir_ns.class_("YorkIR", climate_ir.ClimateIR)
 
 
 CONFIG_SCHEMA = climate_ir.CLIMATE_IR_WITH_RECEIVER_SCHEMA.extend(
     {
-        cv.GenerateID(): cv.declare_id(MideaIR),
-        cv.Optional(CONF_USE_FAHRENHEIT, default=False): cv.boolean,
+        cv.GenerateID(): cv.declare_id(YorkIR),
+#        cv.Optional(CONF_USE_FAHRENHEIT, default=False): cv.boolean,
     }
 )
 
