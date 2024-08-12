@@ -10,7 +10,7 @@ static const char *const TAG = "york_ir.climate";
 
 void ControlData::set_temp(float temp) {
 
-  temp = esphome::clamp<float>(temp, MIN_TEMP, MAX_TEMP);
+  temp = esphome::clamp<float>(temp, YORK_TEMPC_MIN, YORK_TEMPC_MAX);
   
   this->set_temp(temp);
 }
