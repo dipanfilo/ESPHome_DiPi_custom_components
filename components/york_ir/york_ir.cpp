@@ -83,9 +83,9 @@ ClimateFanMode ControlData::get_fan_mode() const {
   }
 }
 
- 
-void YorkIR::control(const climate::ClimateCall &call) {
 
+void YorkIR::control(const climate::ClimateCall &call) {
+  
   
   // swing and preset resets after unit powered off
   if (call.get_mode() == climate::CLIMATE_MODE_OFF) {
@@ -115,7 +115,7 @@ void YorkIR::control(const climate::ClimateCall &call) {
 
 void YorkIR::transmit_(YorkData &data) {
   data.finalize();
-  ESP_LOGV(TAG, "Encode York IR data: %s", data.to_string().c_str());
+  ESP_LOGI(TAG, "Encode York IR data: %s", data.to_string().c_str());
   auto transmit = this->transmitter_->transmit();
   transmit.perform();
   remote_base::YorkProtocol().encode(transmit.get_data(), data);
@@ -140,7 +140,7 @@ bool YorkIR::on_receive(remote_base::RemoteReceiveData data) {
 }
 
 bool YorkIR::on_york_(const YorkData &data) {
-  ESP_LOGV(TAG, "Decoded York IR data: %s", data.to_string().c_str());
+  ESP_LOGI(TAG, "Decoded York IR data: %s", data.to_string().c_str());
 
   const ControlData status = data;
 

@@ -56,6 +56,7 @@ class ControlData : public YorkData {
   void set_fan_mode(ClimateFanMode mode);
   ClimateFanMode get_fan_mode() const;
 
+
  protected:
   enum Mode : uint8_t {
     MODE_COOL = 0b0010,
@@ -70,7 +71,7 @@ class ControlData : public YorkData {
     FAN_QUIET = 0b1001,
     FAN_TURBO = 0b0011,
   };
-  
+
   // The time_struct_t type is used to define a variable for storing the hour and
   // minute of the current time. This will be used to send the date/time to the
   // AC indoor unit.
