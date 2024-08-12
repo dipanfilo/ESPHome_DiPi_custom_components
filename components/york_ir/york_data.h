@@ -71,13 +71,13 @@ class ControlData : public YorkData {
   };
 
 
-  void set_mode_(Mode mode) { this->set_value_(1, mode, 0b1111, 0); }
-  Mode get_mode_() const { return static_cast<Mode>(this->get_value_(1, 0b1111, 0)); }
+  void set_IR_mode_(Mode mode) { this->set_value_(1, mode, 0b1111, 0); }
+  Mode get_IR_mode_() const { return static_cast<Mode>(this->get_value_(1, 0b1111, 0)); }
 
-  void set_fan_mode_(FanMode mode) { this->set_value_(1, mode, 0b1111, 4); }
-  FanMode get_fan_mode_() const { return static_cast<FanMode>(this->get_value_(1, 0b1111, 4)); }
+  void set_IR_fan_mode_(FanMode mode) { this->set_value_(1, mode, 0b1111, 4); }
+  FanMode get_IR_fan_mode_() const { return static_cast<FanMode>(this->get_value_(1, 0b1111, 4)); }
 
-  void set_temp(uint8_t val) 
+  void set_IR_temp(uint8_t val) 
   { 
 
     if((val <= MAX_TEMP && val >= MIN_TEMP)) {
@@ -88,12 +88,12 @@ class ControlData : public YorkData {
       this->set_value_(6, (uint8_t)(24 / 10), 0b1111, 4);
     }
   }
-  float get_temp() const { 
+  float get_IR_temp() const { 
     return ((this->get_value_(6, 0b1111, 4) * 10) + (this->get_value_(6, 0b1111, 0))); 
   }
 
-  void set_power_(bool value) { this->set_value_(7, value, 0b1, 7); }
-  bool get_power_() const { return this->get_value_(7, 0b1, 7); }
+  void set_IR_power_(bool value) { this->set_value_(7, value, 0b1, 7); }
+  bool get_IR_power_() const { return this->get_value_(7, 0b1, 7); }
 
 
   static const uint8_t MAX_TEMP = 30;
