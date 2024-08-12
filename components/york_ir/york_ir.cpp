@@ -101,9 +101,9 @@ void YorkIR::control(const climate::ClimateCall &call) {
               (*call.get_preset() == climate::CLIMATE_PRESET_BOOST && this->preset == climate::CLIMATE_PRESET_NONE))) {
 
   }
-  climate_ir::ClimateIR::control(call);
 
   */
+ climate_ir::ClimateIR::control(call);
 }
 
 
@@ -111,9 +111,8 @@ void YorkIR::control(const climate::ClimateCall &call) {
 void YorkIR::transmit_(YorkData &data) {
   data.finalize();
   auto transmit = this->transmitter_->transmit();
-  ESP_LOGI(TAG, "Encode York IR data: %s", data.to_string().c_str());
-  remote_base::YorkProtocol().encode(transmit.get_data(), data);
   transmit.perform();
+  remote_base::YorkProtocol().encode(transmit.get_data(), data);
 }
 
 void YorkIR::transmit_state() {
