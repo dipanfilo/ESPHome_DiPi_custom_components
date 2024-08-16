@@ -158,6 +158,7 @@ void YorkClimateIR::transmit_state() {
 
   this->IRData.finalize();
   remote_base::YorkProtocol().encode(transmit.get_data(), this->IRData);
+   transmit.perform();
 }
 
 
