@@ -11,12 +11,12 @@ AUTO_LOAD = ["climate_ir"]
 CODEOWNERS = ["@panwil"]
 
 york_ir_ns = cg.esphome_ns.namespace("york_ir")
-YorkIR = york_ir_ns.class_("YorkIR", climate_ir.ClimateIR)
+YorkClimateIR = york_ir_ns.class_("YorkClimateIR", climate_ir.ClimateIR)
 
 
 CONFIG_SCHEMA = climate_ir.CLIMATE_IR_WITH_RECEIVER_SCHEMA.extend(
     {
-        cv.GenerateID(): cv.declare_id(YorkIR),
+        cv.GenerateID(): cv.declare_id(YorkClimateIR),
         cv.Optional(CONF_HEAT_ACTION): automation.validate_automation(single=False),
     }
 )
@@ -25,4 +25,4 @@ CONFIG_SCHEMA = climate_ir.CLIMATE_IR_WITH_RECEIVER_SCHEMA.extend(
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await climate_ir.register_climate_ir(var, config)
-#    cg.add(var.set_fahrenheit(config[CONF_USE_FAHRENHEIT]))
+

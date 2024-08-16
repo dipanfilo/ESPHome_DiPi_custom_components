@@ -30,34 +30,20 @@
 // checksum of all the reverse bit order nibbles before it.
 
 // Temperature
-const uint8_t YORK_TEMPC_MIN = 16;  // Celsius
-const uint8_t YORK_TEMPC_MAX = 30;  // Celsius
+const float YORK_TEMPC_MIN = 16.0;  // Celsius
+const float YORK_TEMPC_MAX = 30.0;  // Celsius
 
 namespace esphome {
 namespace york_ir {
 
-using climate::ClimateMode;
-using climate::ClimateFanMode;
-using remote_base::YorkData;
 
-class ControlData : public YorkData {
+class YorkIRData : public remote_base::YorkData {
  public:
   // Default constructor ()
-  ControlData() : YorkData() {}
+  YorkIRData() : YorkData() {}
   // Copy from Base
-  ControlData(const YorkData &data) : YorkData(data) {}
+  YorkIRData(const remote_base::YorkData &data) : remote_base::YorkData(data) {}
 
-  void set_temp(float temp);
-  float get_temp() const;
-
-  void set_mode(ClimateMode mode);
-  ClimateMode get_mode() const;
-
-  void set_fan_mode(ClimateFanMode mode);
-  ClimateFanMode get_fan_mode() const;
-
-
- protected:
   enum Mode : uint8_t {
     MODE_COOL = 0b0010,
     MODE_DRY = 0b0001,
@@ -70,6 +56,10 @@ class ControlData : public YorkData {
     FAN_HIGH = 0b0010,
     FAN_QUIET = 0b1001,
     FAN_TURBO = 0b0011,
+  };
+  enum VSwingMode : uint8_t {
+    VSWING_OFF = 0b0000,
+    VSWING_AUTO = 0b0001,
   };
 
   // The time_struct_t type is used to define a variable for storing the hour and
@@ -91,17 +81,17 @@ class ControlData : public YorkData {
 
 
 
-  void set_IR_mode_(Mode mode) { 
+  void set_IR_mode(Mode mode) { 
     this->set_value_(1, mode, 0b1111, 0); 
   }
-  Mode get_IR_mode_() const { 
+  Mode get_IR_mode() const { 
     return static_cast<Mode>(this->get_value_(1, 0b1111, 0)); 
   }
 
-  void set_IR_fan_mode_(FanMode mode) { 
+  void set_IR_fan_mode(FanMode mode) { 
     this->set_value_(1, mode, 0b1111, 4); 
   }
-  FanMode get_IR_fan_mode_() const { 
+  FanMode get_IR_fan_mode() const { 
     return static_cast<FanMode>(this->get_value_(1, 0b1111, 4)); 
   }
 
@@ -119,10 +109,10 @@ class ControlData : public YorkData {
     return ((this->get_value_(6, 0b1111, 4) * 10) + (this->get_value_(6, 0b1111, 0))); 
   }
 
-  void set_IR_power_(bool value) { 
+  void set_IR_power(bool value) { 
     this->set_value_(7, value, 0b1, 7); 
   }
-  bool get_IR_power_() const { 
+  bool get_IR_power() const { 
     return this->get_value_(7, 0b0001, 7); 
   }
 
@@ -193,18 +183,11 @@ class ControlData : public YorkData {
   }
   bool get_IR_Swing() {
     return (bool)(this->get_value_(7, 0b0001, 0));
-  }
-    
+  } 
  
- 
-  static const uint8_t VSWING_OFF = 0;
-  static const uint8_t VSWING_AUTO = 1;
+
   
 };
-
-
-
-
 
 }  // namespace midea_ir
 }  // namespace esphome
