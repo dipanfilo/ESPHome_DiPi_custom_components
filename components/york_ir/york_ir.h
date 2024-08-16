@@ -22,13 +22,14 @@ class YorkClimateIR : public climate_ir::ClimateIR {
   YorkIRData IRData;
 
   void sendIR();
-  
+
  protected:
 
   /// Transmit via IR the state of this climate controller.
   void transmit_state() override;
   /// Handle received IR Buffer
   bool on_receive(remote_base::RemoteReceiveData data) override;
+
 };
 
 }  // namespace york_ir

@@ -78,8 +78,15 @@ class YorkIRData : public remote_base::YorkData {
     bool halfHour;
     bool active;
   };
-
-
+  // Make from initializer_list
+  void setData(std::initializer_list<uint8_t> data) {
+    std::copy_n(data.begin(), std::min(data.size(), this->data_.size()), this->data_.begin());
+  }
+  // Make from vector
+  void setData(const std::vector<uint8_t> &data) {
+    std::copy_n(data.begin(), std::min(data.size(), this->data_.size()), this->data_.begin());
+  }
+ 
 
   void set_IR_mode(Mode mode) { 
     this->set_value_(1, mode, 0b1111, 0); 

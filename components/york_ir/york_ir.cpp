@@ -163,14 +163,44 @@ void YorkClimateIR::transmit_state() {
 
 
 bool YorkClimateIR::on_receive(remote_base::RemoteReceiveData data) {
-  //auto YorkData = remote_base::YorkProtocol().decode(data);
-  //if (YorkData.has_value()) {
-  //  this->IRData = YorkData;    
-  //  this->publish_state();
-  //}
+  auto YorkIR_RxData = remote_base::YorkProtocol().decode(data);
+
+  if (YorkIR_RxData.has_value()) {
+    const remote_base::YorkData IRData = *YorkIR_RxData;
+    
+    const uint8_t* data = IRData.data();
+    std::vector<uint8_t> vec(data, data + IRData.size());
+    this->IRData.setData(vec); 
+    
+
+    // Temp
+    this->target_temperature = this->IRData.get_IR_temp();
+  
+    // Mode
+    switch (this->IRData.get_IR_mode()) {
+      case this->IRData.MODE_COOL:
+        this->mode = climate::CLIMATE_MODE_COOL;
+        break;
+      case this->IRData.MODE_DRY:
+        this->mode = climate::CLIMATE_MODE_DRY;
+        break;
+      case this->IRData.MODE_FAN_ONLY:
+        this->mode = climate::CLIMATE_MODE_FAN_ONLY;
+        break;
+      default:
+        this->mode = climate::CLIMATE_MODE_COOL;
+        break;
+    }
+
+    this->publish_state();
+
+  }
 
   return true;
 }
+
+
+
 
 
 
