@@ -1,7 +1,7 @@
 #pragma once
 
 #include "esphome/components/remote_base/york_protocol.h"
-#include "esphome/components/climate/climate_mode.h"
+#include "esphome/core/log.h"
 
 
 
@@ -66,18 +66,60 @@ class YorkIRData : public remote_base::YorkData {
   // minute of the current time. This will be used to send the date/time to the
   // AC indoor unit.
   struct time_struct_t {
-    unsigned int hour;
-    unsigned int minute;
+    unsigned int hour = 0;
+    unsigned int minute = 0;
   };
 
   // The timer_struct_t type is used to define a variable to hold the auto on/off
   // data to send to the AC indoor unit. As with the remote controller, you can
   // only define a time with 30 minute increments.
   struct timer_struct_t {
-    unsigned int hour;
-    bool halfHour;
-    bool active;
+    unsigned int hour = 0;
+    bool halfHour = false;
+    bool active = false;
   };
+
+  const LogString *operation_mode_to_string(Mode mode) {
+      switch (mode) {
+      case MODE_COOL:
+        return LOG_STR("MODE_COOL");
+      case MODE_DRY:
+        return LOG_STR("MODE_DRY");
+      case MODE_FAN_ONLY:
+        return LOG_STR("MODE_FAN_ONLY");
+      default:
+        return LOG_STR("UNKNOWN");
+    }
+  }
+  const LogString *fan_mode_to_string(FanMode mode) {
+    switch (mode) {
+      case FAN_AUTO:
+        return LOG_STR("FAN_AUTO");
+      case FAN_LOW:
+        return LOG_STR("FAN_LOW");
+      case FAN_MEDIUM:
+        return LOG_STR("FAN_MEDIUM");
+      case FAN_HIGH:
+        return LOG_STR("FAN_HIGH");
+      case FAN_QUIET:
+        return LOG_STR("FAN_QUIET");
+      case FAN_TURBO:
+        return LOG_STR("FAN_TURBO");
+      default:
+        return LOG_STR("UNKNOWN");
+    }
+  }
+  const LogString *swing_mode_to_string(VSwingMode mode) {
+    switch (mode) {
+      case VSWING_OFF:
+        return LOG_STR("VSWING_OFF");
+      case VSWING_AUTO:
+        return LOG_STR("VSWING_AUTO");
+      default:
+        return LOG_STR("UNKNOWN");
+    }
+  }
+
   // Make from initializer_list
   void setData(std::initializer_list<uint8_t> data) {
     std::copy_n(data.begin(), std::min(data.size(), this->data_.size()), this->data_.begin());
@@ -117,10 +159,10 @@ class YorkIRData : public remote_base::YorkData {
   }
 
   void set_IR_power(bool value) { 
-    this->set_value_(7, value, 0b1, 7); 
+    this->set_value_(7, value, 0b0001, 3); 
   }
   bool get_IR_power() const { 
-    return this->get_value_(7, 0b0001, 7); 
+    return this->get_value_(7, 0b0001, 3); 
   }
 
   void set_IR_currentTime( uint8_t hour,  uint8_t minute) {
@@ -152,7 +194,7 @@ class YorkIRData : public remote_base::YorkData {
       this->set_value_(4, 0, 0);
     }
   }
-  timer_struct_t get_IR_OnTimer() {
+  timer_struct_t get_IR_OnTimer() const {
     timer_struct_t onTimer;
     onTimer.hour =          ((this->get_value_(4, 0b0011, 4) * 10) + (this->get_value_(4, 0b1111, 0)));
     onTimer.halfHour = (bool)(this->get_value_(4, 0b0001, 6));
@@ -170,31 +212,29 @@ class YorkIRData : public remote_base::YorkData {
       this->set_value_(5, 0, 0);
     }
   }
-  timer_struct_t get_IR_OffTimer() {
-    timer_struct_t onTimer;
-    onTimer.hour =          ((this->get_value_(5, 0b0011, 4) * 10) + (this->get_value_(4, 0b1111, 0)));
-    onTimer.halfHour = (bool)(this->get_value_(5, 0b0001, 6));
-    onTimer.active   = (bool)(this->get_value_(5, 0b0001, 7));
-    return onTimer;
+  timer_struct_t get_IR_OffTimer() const {
+    timer_struct_t offTimer;
+    offTimer.hour =          ((this->get_value_(5, 0b0011, 4) * 10) + (this->get_value_(5, 0b1111, 0)));
+    offTimer.halfHour = (bool)(this->get_value_(5, 0b0001, 6));
+    offTimer.active   = (bool)(this->get_value_(5, 0b0001, 7));
+    return offTimer;
   }   
  
   void set_IR_Sleep(bool active) {
     this->set_value_(7, active, 0b0001, 1);
   }
-  bool get_IR_Sleep() {
+  bool get_IR_Sleep() const {
     return (bool)(this->get_value_(7, 0b0001, 1));
   }
 
   void set_IR_Swing(bool active){
     this->set_value_(7, active, 0b0001, 0);
   }
-  bool get_IR_Swing() {
+  bool get_IR_Swing() const {
     return (bool)(this->get_value_(7, 0b0001, 0));
   } 
- 
 
-  
 };
 
-}  // namespace midea_ir
+}  // namespace york_ir
 }  // namespace esphome

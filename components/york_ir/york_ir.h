@@ -1,35 +1,86 @@
 #pragma once
 
-#include "esphome/components/climate_ir/climate_ir.h"
+#include <utility>
+
+#include "esphome/components/climate/climate.h"
+#include "esphome/components/remote_base/remote_base.h"
+#include "esphome/components/remote_transmitter/remote_transmitter.h"
+#include "esphome/components/sensor/sensor.h"
+
 #include "york_data.h"
 
 namespace esphome {
 namespace york_ir {
 
 
-class YorkClimateIR : public climate_ir::ClimateIR {
- public:
-  YorkClimateIR()
-      : climate_ir::ClimateIR(
-            YORK_TEMPC_MIN, YORK_TEMPC_MAX, 1.0f, true, true,
-            {climate::CLIMATE_FAN_AUTO, climate::CLIMATE_FAN_LOW, climate::CLIMATE_FAN_MEDIUM, climate::CLIMATE_FAN_HIGH},
-            {climate::CLIMATE_SWING_OFF, climate::CLIMATE_SWING_VERTICAL},
-            {climate::CLIMATE_PRESET_NONE, climate::CLIMATE_PRESET_SLEEP, climate::CLIMATE_PRESET_BOOST}) { }
+class YorkClimateIR : public PollingComponent,
+                      public climate::Climate,
+                      public remote_base::RemoteReceiverListener,
+                      public remote_base::RemoteTransmittable {            
+                      
 
-  /// Override control to change settings of the climate device.
-  //void control(const climate::ClimateCall &call) override;
+ public:
+  YorkClimateIR() {}
+      
 
   YorkIRData IRData;
 
-  void sendIR();
+  uint32_t millis_now_;
+
+
+
+  void setup() override;
+  void update() override;
+  float get_setup_priority() const override;
+  void dump_config() override;
+  void set_sensor(sensor::Sensor *sensor) { 
+    this->sensor_ = sensor; 
+  }
+  void set_ignore_rx_after_tx(uint32_t value) { 
+    this->ignore_RX_after_TX_.config = value; 
+  }
+  void set_delay_after_power_forze_button(uint32_t value) {
+    this->delay_Update_after_Forze_Power_On_Button_.config = value;
+    this->delay_Update_after_Forze_Power_Off_Button_.config = value;
+  }
+
+
+  void button_force_power_on();
+  void button_force_power_off();
+  void button_togel_power_onoff();
+  void button_dump_ir_data();
+
+
+  struct timeout_t {
+    uint32_t config;
+    uint32_t millisOld;
+    bool activate;
+  };
+
 
  protected:
+  /// Override control to change settings of the climate device.
+  void control(const climate::ClimateCall &call) override;
+  /// Return the traits of this controller.
+  climate::ClimateTraits traits() override;
 
   /// Transmit via IR the state of this climate controller.
-  void transmit_state() override;
-  /// Handle received IR Buffer
+  virtual void transmit_state(bool power_button);
+
+  // Dummy implement on_receive so implementation is optional for inheritors
   bool on_receive(remote_base::RemoteReceiveData data) override;
 
+  sensor::Sensor *sensor_{nullptr};
+
+  uint32_t loopCounter_ = 0;
+
+  bool virtual_power_status_AC_;
+  timeout_t ignore_RX_after_TX_;
+  timeout_t delay_Update_after_Forze_Power_On_Button_;
+  timeout_t delay_Update_after_Forze_Power_Off_Button_;
+
+  YorkIRData::timer_struct_t old_TimerOn_;
+  YorkIRData::timer_struct_t old_TimerOff_;
 };
 
 }  // namespace york_ir
