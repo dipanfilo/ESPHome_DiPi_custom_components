@@ -94,7 +94,7 @@ void YorkClimateIR::update() {
     this->delay_Update_after_Forze_Power_Off_Button_.millisOld = this->millis_now_;
   }
 
-  this->update_sub_binary_sensor_(SubBinarySensorType::POWER_ON_STATUS, this->virtual_power_status_AC_);
+  this->update_sub_binary_sensor_(SubBinarySensorType::POWER_ON_STATUS, this->virtual_power_status_AC_ ? 1 : 0);
 
   this->loopCounter_++;
 }
@@ -326,7 +326,7 @@ void YorkClimateIR::update_sub_binary_sensor_(SubBinarySensorType type, uint8_t 
     size_t index = (size_t) type;
     if ((this->sub_binary_sensors_[index] != nullptr) && 
        ((!this->sub_binary_sensors_[index]->has_state()) || (this->sub_binary_sensors_[index]->state != converted_value)))
-          this->sub_binary_sensors_[index]->publish_state(converted_value);
+        this->sub_binary_sensors_[index]->publish_state(converted_value);
   }
 }
 #endif  // USE_BINARY_SENSOR
