@@ -94,7 +94,7 @@ void YorkClimateIR::update() {
     this->delay_Update_after_Forze_Power_Off_Button_.millisOld = this->millis_now_;
   }
 
-  
+  this->update_sub_binary_sensor_(SubBinarySensorType::POWER_ON_STATUS, this->virtual_power_status_AC_);
 
   this->loopCounter_++;
 }
@@ -118,6 +118,7 @@ void YorkClimateIR::update() {
     ESP_LOGCONFIG(TAG, "        - Time: %d:%s", this->old_TimerOn_.hour, this->old_TimerOn_.halfHour ? "30" : "00");
     ESP_LOGCONFIG(TAG, "      - Timer Off old: %s", this->old_TimerOff_.active ? "true" : "false");
     ESP_LOGCONFIG(TAG, "        - Time: %d:%s", this->old_TimerOff_.hour, this->old_TimerOff_.halfHour ? "30" : "00");
+    ESP_LOGCONFIG(TAG, "      - Virtual Power Status: %s", this->virtual_power_status_AC_ ? "1" : "0");
   }
 
 
@@ -320,14 +321,11 @@ void YorkClimateIR::set_sub_binary_sensor(SubBinarySensorType type, binary_senso
   }
 }
 
-void YorkClimateIR::update_sub_binary_sensor_(SubBinarySensorType type, uint8_t value) {
-  if (value < 2) {
-    bool converted_value = value == 1;
+void YorkClimateIR::update_sub_binary_sensor_(SubBinarySensorType type, bool value) {
     size_t index = (size_t) type;
     if ((this->sub_binary_sensors_[index] != nullptr) && 
-       ((!this->sub_binary_sensors_[index]->has_state()) || (this->sub_binary_sensors_[index]->state != converted_value)))
-        this->sub_binary_sensors_[index]->publish_state(converted_value);
-  }
+       ((!this->sub_binary_sensors_[index]->has_state()) || (this->sub_binary_sensors_[index]->state != value)))
+        this->sub_binary_sensors_[index]->publish_state(value);
 }
 #endif  // USE_BINARY_SENSOR
 

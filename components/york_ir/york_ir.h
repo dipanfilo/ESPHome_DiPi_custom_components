@@ -78,7 +78,7 @@ class YorkClimateIR : public PollingComponent,
 
   sensor::Sensor *sensor_{nullptr};
 
-  void update_sub_binary_sensor_(SubBinarySensorType type, uint8_t value);
+  void update_sub_binary_sensor_(SubBinarySensorType type, bool value);
   binary_sensor::BinarySensor *sub_binary_sensors_[(size_t) SubBinarySensorType::SUB_BINARY_SENSOR_TYPE_COUNT]{nullptr};
   int big_data_sensors_{0};
 
