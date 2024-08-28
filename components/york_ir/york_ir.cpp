@@ -94,7 +94,7 @@ void YorkClimateIR::update() {
     this->delay_Update_after_Forze_Power_Off_Button_.millisOld = this->millis_now_;
   }
 
-  this->update_sub_binary_sensor_(SubBinarySensorType::POWER_ON_STATUS, this->virtual_power_status_AC_ ? 1 : 0);
+  
 
   this->loopCounter_++;
 }
