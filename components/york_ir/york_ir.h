@@ -58,6 +58,12 @@ class YorkClimateIR : public PollingComponent,
   };
 
 
+  enum class SubBinarySensorType {
+    POWER_ON_STATUS,
+    SUB_BINARY_SENSOR_TYPE_COUNT
+  };
+  void set_sub_binary_sensor(SubBinarySensorType type, binary_sensor::BinarySensor *sens);
+
  protected:
   /// Override control to change settings of the climate device.
   void control(const climate::ClimateCall &call) override;
@@ -71,6 +77,10 @@ class YorkClimateIR : public PollingComponent,
   bool on_receive(remote_base::RemoteReceiveData data) override;
 
   sensor::Sensor *sensor_{nullptr};
+
+  void update_sub_binary_sensor_(SubBinarySensorType type, uint8_t value);
+  binary_sensor::BinarySensor *sub_binary_sensors_[(size_t) SubBinarySensorType::SUB_BINARY_SENSOR_TYPE_COUNT]{nullptr};
+  int big_data_sensors_{0};
 
   uint32_t loopCounter_ = 0;
 

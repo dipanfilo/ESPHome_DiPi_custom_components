@@ -94,6 +94,8 @@ void YorkClimateIR::update() {
     this->delay_Update_after_Forze_Power_Off_Button_.millisOld = this->millis_now_;
   }
 
+  this->update_sub_binary_sensor_(SubBinarySensorType::POWER_ON_STATUS, this->virtual_power_status_AC_);
+
   this->loopCounter_++;
 }
  void YorkClimateIR::dump_config() { 
@@ -305,6 +307,29 @@ void YorkClimateIR::button_dump_ir_data(){
   YorkClimateIR::dump_config();
 }
 
+
+#ifdef USE_BINARY_SENSOR
+void YorkClimateIR::set_sub_binary_sensor(SubBinarySensorType type, binary_sensor::BinarySensor *sens) {
+  if (type < SubBinarySensorType::SUB_BINARY_SENSOR_TYPE_COUNT) {
+    if ((this->sub_binary_sensors_[(size_t) type] != nullptr) && (sens == nullptr)) {
+      this->big_data_sensors_--;
+    } else if ((this->sub_binary_sensors_[(size_t) type] == nullptr) && (sens != nullptr)) {
+      this->big_data_sensors_++;
+    }
+    this->sub_binary_sensors_[(size_t) type] = sens;
+  }
+}
+
+void YorkClimateIR::update_sub_binary_sensor_(SubBinarySensorType type, uint8_t value) {
+  if (value < 2) {
+    bool converted_value = value == 1;
+    size_t index = (size_t) type;
+    if ((this->sub_binary_sensors_[index] != nullptr) && 
+       ((!this->sub_binary_sensors_[index]->has_state()) || (this->sub_binary_sensors_[index]->state != converted_value)))
+          this->sub_binary_sensors_[index]->publish_state(converted_value);
+  }
+}
+#endif  // USE_BINARY_SENSOR
 
 
 }  // namespace york_ir
