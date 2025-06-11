@@ -286,16 +286,35 @@ void YorkClimateIR::control(const climate::ClimateCall &call) {
 
 void YorkClimateIR::button_force_power_on() {
   this->old_TimerOn_ = this->IRData.get_IR_OnTimer();
-  this->IRData.set_IR_OnTimer(1,false,true);
-  this->IRData.set_IR_currentTime(0,59);
+  this->IRData.set_IR_OnTimer(((this->IRData.get_IR_currentTime + 3) % 24) ,false,true);
+  this->IRData.set_IR_currentTime(((this->IRData.get_IR_currentTime + 2) % 24) ,59);
+
+  if (this->delay_Update_after_Forze_Power_Off_Button_.activate) {
+    this->delay_Update_after_Forze_Power_Off_Button_.activate = false;
+
+    this->IRData.set_IR_OffTimer(this->old_TimerOff_.hour, this->old_TimerOff_.halfHour, this->old_TimerOff_.active);
+    this->old_TimerOff_.hour = 0;
+    this->old_TimerOff_.halfHour = false;
+    this->old_TimerOff_.active = false;
+  }
 
   this->transmit_state(!this->virtual_power_status_AC_);
   this->delay_Update_after_Forze_Power_On_Button_.activate = true;
 }
-void YorkClimateIR::button_force_power_off(){
+
+void YorkClimateIR::button_force_power_off() {
   this->old_TimerOff_ = this->IRData.get_IR_OffTimer();
-  this->IRData.set_IR_OffTimer(2,false,true);
-  this->IRData.set_IR_currentTime(1,59);
+  this->IRData.set_IR_OffTimer(((this->IRData.get_IR_currentTime + 2) % 24) ,false,true);
+  this->IRData.set_IR_currentTime(((this->IRData.get_IR_currentTime + 1) % 24) ,59);
+
+  if (this->delay_Update_after_Forze_Power_On_Button_.activate) {
+    this->delay_Update_after_Forze_Power_On_Button_.activate = false;
+  
+    this->IRData.set_IR_OnTimer(this->old_TimerOn_.hour, this->old_TimerOn_.halfHour, this->old_TimerOn_.active);
+    this->old_TimerOn_.hour = 0;
+    this->old_TimerOn_.halfHour = false;
+    this->old_TimerOn_.active = false;
+  }
 
   this->transmit_state(this->virtual_power_status_AC_);
   this->delay_Update_after_Forze_Power_Off_Button_.activate = true;
