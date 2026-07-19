@@ -59,7 +59,7 @@ void ToshibaAcChProtocol::encode(RemoteTransmitData *dst, const ToshibaAcChData 
     }
 }
 
-ooptional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
+optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
     ToshibaAcChData packet1; 
     ToshibaAcChData out; 
     
