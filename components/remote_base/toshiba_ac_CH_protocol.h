@@ -2,9 +2,11 @@
 
 #include "remote_base.h"
 #include <vector>
-#include <algorithm>
 
 namespace esphome::remote_base {
+
+#define TOSHIBA_AC_CH_MAX_BYTE 11
+
 
 struct ToshibaAcCHData {
     uint8_t nbits; 
