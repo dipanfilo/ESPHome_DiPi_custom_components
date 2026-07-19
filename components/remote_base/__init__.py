@@ -2241,7 +2241,16 @@ async def Toto_action(var, config, args):
 
 
 
-
+def validate_raw_data(value):
+    if isinstance(value, str):
+        return value.encode("utf-8")
+    if isinstance(value, str):
+        return value
+    if isinstance(value, list):
+        return cv.Schema([cv.hex_uint8_t])(value)
+    raise cv.Invalid(
+        "data must either be a string wrapped in quotes or a list of bytes"
+    )
 
 # Toshiba AC CH Base Protocol Registrations
 (
@@ -2258,7 +2267,8 @@ async def Toto_action(var, config, args):
 TOSHIBA_AC_CH_SCHEMA = cv.Schema(
     {
         cv.Optional(CONF_NBITS, default=72): cv.uint8_t,
-        cv.Required(CONF_DATA): cv.templatable(validate_raw_data),
+        #cv.Required(CONF_DATA): cv.templatable(validate_raw_data),
+        cv.Required(CONF_DATA): cv.Schema([cv.hex_uint8_t]),
     }
 )
 
@@ -2305,13 +2315,3 @@ async def toshibaacch_action(var, config, args):
         arr = cg.static_const_array(arr_id, cg.ArrayInitializer(*data_))
         cg.add(var.set_data_static(arr, len(data_), nbits_tmpl))
 
-def validate_raw_data(value):
-    if isinstance(value, str):
-        return value.encode("utf-8")
-    if isinstance(value, str):
-        return value
-    if isinstance(value, list):
-        return cv.Schema([cv.hex_uint8_t])(value)
-    raise cv.Invalid(
-        "data must either be a string wrapped in quotes or a list of bytes"
-    )
