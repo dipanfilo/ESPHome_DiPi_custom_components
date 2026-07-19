@@ -59,21 +59,26 @@ void ToshibaAcChProtocol::encode(RemoteTransmitData *dst, const ToshibaAcChData 
     }
 }
 
-optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
+ooptional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
     ToshibaAcChData packet1; 
     ToshibaAcChData out; 
     
+    ESP_LOGD("toshiba_ac_ch", "Starting bit read...");
+
     packet1.nbits = 0;
     out.nbits = 0;
 
-    // CRITICAL: Pre-size the vectors to hold the maximum expected bytes 
-    // and initialize them to 0 so the bit-shifting logic works.
     packet1.data.assign(TOSHIBA_AC_CH_MAX_BYTE, 0);
     out.data.assign(TOSHIBA_AC_CH_MAX_BYTE, 0);
 
     // --- Packet 1 Decode ---
-    if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
+    if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US)) {
+        // Uncomment this line if you want to see every single sync miss, but warning: it can be noisy!
+        // ESP_LOGD("toshiba_ac_ch", "Packet 1 Header mismatch");
         return {};
+    }
+    
+    ESP_LOGD("toshiba_ac_ch", "Packet 1 Header matched! Starting bit read...");
         
     for (uint8_t bit_counter = 0; bit_counter < (TOSHIBA_AC_CH_MAX_BYTE * 8); bit_counter++) {
         uint8_t byte_idx = bit_counter / 8;
@@ -85,15 +90,21 @@ optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
             packet1.data[byte_idx] = (packet1.data[byte_idx] << 1) | 0;
             packet1.nbits++;
         } else if (src.expect_item(BIT_HIGH_US, PACKET_SPACE)) {
+            ESP_LOGD("toshiba_ac_ch", "Packet 1 hit PACKET_SPACE break at bit %d", packet1.nbits);
             break;
         } else {
+            ESP_LOGD("toshiba_ac_ch", "Packet 1 failed at bit %d. Unexpected pulse timing.", bit_counter);
             return {};
         }
     }
 
     // --- Packet 2 Decode ---
-    if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
+    if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US)) {
+        ESP_LOGD("toshiba_ac_ch", "Packet 2 Header mismatch after reading Packet 1 successfully.");
         return {};
+    }
+    
+    ESP_LOGD("toshiba_ac_ch", "Packet 2 Header matched! Starting bit read...");
         
     for (uint8_t bit_counter = 0; bit_counter < (TOSHIBA_AC_CH_MAX_BYTE * 8); bit_counter++) {
         uint8_t byte_idx = bit_counter / 8;
@@ -105,27 +116,29 @@ optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
             out.data[byte_idx] = (out.data[byte_idx] << 1) | 0;
             out.nbits++;
         } else if (src.expect_item(BIT_HIGH_US, PACKET_SPACE)) {
+            ESP_LOGD("toshiba_ac_ch", "Packet 2 hit PACKET_SPACE break at bit %d", out.nbits);
             break;
         } else {
+            ESP_LOGD("toshiba_ac_ch", "Packet 2 failed at bit %d. Unexpected pulse timing.", bit_counter);
             return {};
         }
     }
     
     // --- Post-processing & Validation ---
-
-    // Clean up the unused trailing bytes in the vectors so their actual size 
-    // matches the exact amount of data successfully read.
     uint8_t actual_bytes_p1 = (packet1.nbits + 7) / 8;
     uint8_t actual_bytes_out = (out.nbits + 7) / 8;
     packet1.data.resize(actual_bytes_p1);
     out.data.resize(actual_bytes_out);
 
-    // Now we can use the custom `==` operator we built earlier!
-    // This automatically compares both .nbits and the .data vector equality.
+    ESP_LOGD("toshiba_ac_ch", "P1 Bits: %d, P2 Bits: %d", packet1.nbits, out.nbits);
+
+    // Validation Check
     if (packet1 != out) {
+        ESP_LOGD("toshiba_ac_ch", "Validation Failed: Packet 1 data does not equal Packet 2 repeat data.");
         return {};
     }
 
+    ESP_LOGD("toshiba_ac_ch", "Decode Successful! Matching payload passed to component.");
     return out;
 }
 
