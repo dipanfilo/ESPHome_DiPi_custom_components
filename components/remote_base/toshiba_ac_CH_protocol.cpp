@@ -122,13 +122,14 @@ optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
            
             int32_t next_space = std::abs(src[1]); 
             // Print the timing value directly to the ESPHome logs
-            ESP_LOGD("toshiba_ac_ch", "Trailing space check: next_space is %d us", next_space);
 
-            if (next_space > PACKET_SPACE) {
-                 src.expect_mark(BIT_HIGH_US);
+            src.expect_mark(BIT_HIGH_US);
+            if (next_space > PACKET_SPACE / 2 ) {
+                src.expect_space(next_space);
                 ESP_LOGD("toshiba_ac_ch", "Packet 2 successfully hit the final trailing mark at bit %d", out.nbits);
                 break;
             } else {
+                ESP_LOGD("toshiba_ac_ch", "Trailing space check: next_space is %d us", next_space);
                 ESP_LOGD("toshiba_ac_ch", "Packet 2 failed at bit %d, for the final trailing mark.", bit_counter);
                 return {};
             }
