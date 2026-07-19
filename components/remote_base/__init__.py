@@ -2252,11 +2252,22 @@ async def Toto_action(var, config, args):
     ToshibaAcChDumper,
 ) = declare_protocol("ToshibaAcCh")
 
+def validate_raw_data(value):
+    if isinstance(value, str):
+        return value.encode("utf-8")
+    if isinstance(value, str):
+        return value
+    if isinstance(value, list):
+        return cv.Schema([cv.hex_uint8_t])(value)
+    raise cv.Invalid(
+        "data must either be a string wrapped in quotes or a list of bytes"
+    )
+
 # Configuration Schema validation
 TOSHIBA_AC_CH_SCHEMA = cv.Schema(
     {
         cv.Optional(CONF_NBITS, default=72): cv.uint8_t,
-        cv.Required(CONF_DATA): cv.hex_uint8_list,
+        cv.Required(CONF_DATA): cv.templatable(validate_raw_data),
     }
 )
 
