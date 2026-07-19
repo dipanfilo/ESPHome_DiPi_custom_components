@@ -18,25 +18,36 @@ static constexpr uint32_t FOOTER_LOW_US = 4500;
 static constexpr uint16_t PACKET_SPACE = 5500;
 
 void ToshibaAcCHProtocol::encode(RemoteTransmitData *dst, const ToshibaAcCHData &data) {
+    // Safety check: Ensure the vector actually contains data to send
+    if (data.data.empty() || data.nbits == 0) {
+        return;
+    }
+
     dst->set_carrier_frequency(38000);
     // Reserve space for the timings: (Header + Bits + Footer) * 2 bursts
-    dst->reserve((2 + (data.bit_count * 2) + 2) * 2);
+    dst->reserve((2 + (data.nbits * 2) + 2) * 2);
 
     for (uint8_t repeat = 0; repeat < 2; repeat++) {
         // 1. Send Header
         dst->item(HEADER_HIGH_US, HEADER_LOW_US);
         
-        // 2. Loop through every single bit up to data.bit_count
-        for (uint8_t bit_idx = 0; bit_idx < data.bit_count; bit_idx++) {
+        // 2. Loop through every single bit up to data.nbits
+        for (uint8_t bit_idx = 0; bit_idx < data.nbits; bit_idx++) {
             // Determine which byte the bit resides in
             uint8_t byte_pos = bit_idx / 8;
+            
+            // Double safety: Prevent out-of-bounds crash if nbits is malformed
+            if (byte_pos >= data.data.size()) {
+                break;
+            }
+
             // Determine the bit shift position (MSB first within the byte)
             uint8_t bit_pos = 7 - (bit_idx % 8);
             
             dst->mark(BIT_HIGH_US);
             
-            // Extract the specific bit and encode it
-            if ((data.bytes[byte_pos] >> bit_pos) & 1) {
+            // Extract the specific bit from the std::vector and encode it
+            if ((data.data[byte_pos] >> bit_pos) & 1) {
                 dst->space(BIT_ONE_LOW_US);
             } else {
                 dst->space(BIT_ZERO_LOW_US);
@@ -49,13 +60,18 @@ void ToshibaAcCHProtocol::encode(RemoteTransmitData *dst, const ToshibaAcCHData 
 }
 
 optional<ToshibaAcCHData> ToshibaAcCHProtocol::decode(RemoteReceiveData src) {
-    ToshibaAcCHData packet1; // Uses default struct initializers
+    ToshibaAcCHData packet1; 
     ToshibaAcCHData out; 
     
-    packet1.bit_count = 0;
-    out.bit_count = 0;
+    packet1.nbits = 0;
+    out.nbits = 0;
 
-    // *** Packet 1 (120 bits -> 15 bytes)
+    // CRITICAL: Pre-size the vectors to hold the maximum expected bytes 
+    // and initialize them to 0 so the bit-shifting logic works.
+    packet1.data.assign(TOSHIBA_AC_CH_MAX_BYTE, 0);
+    out.data.assign(TOSHIBA_AC_CH_MAX_BYTE, 0);
+
+    // --- Packet 1 Decode ---
     if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
         return {};
         
@@ -63,11 +79,11 @@ optional<ToshibaAcCHData> ToshibaAcCHProtocol::decode(RemoteReceiveData src) {
         uint8_t byte_idx = bit_counter / 8;
         
         if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
-            packet1.bytes[byte_idx] = (packet1.bytes[byte_idx] << 1) | 1;
-            packet1.bit_count++;
+            packet1.data[byte_idx] = (packet1.data[byte_idx] << 1) | 1;
+            packet1.nbits++;
         } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
-            packet1.bytes[byte_idx] = (packet1.bytes[byte_idx] << 1) | 0;
-            packet1.bit_count++;
+            packet1.data[byte_idx] = (packet1.data[byte_idx] << 1) | 0;
+            packet1.nbits++;
         } else if (src.expect_item(BIT_HIGH_US, PACKET_SPACE)) {
             break;
         } else {
@@ -75,7 +91,7 @@ optional<ToshibaAcCHData> ToshibaAcCHProtocol::decode(RemoteReceiveData src) {
         }
     }
 
-    // *** Packet 2 (120 bits -> 15 bytes)
+    // --- Packet 2 Decode ---
     if (!src.expect_item(HEADER_HIGH_US, HEADER_LOW_US))
         return {};
         
@@ -83,11 +99,11 @@ optional<ToshibaAcCHData> ToshibaAcCHProtocol::decode(RemoteReceiveData src) {
         uint8_t byte_idx = bit_counter / 8;
         
         if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
-            out.bytes[byte_idx] = (out.bytes[byte_idx] << 1) | 1;
-            out.bit_count++;
+            out.data[byte_idx] = (out.data[byte_idx] << 1) | 1;
+            out.nbits++;
         } else if (src.expect_item(BIT_HIGH_US, BIT_ZERO_LOW_US)) {
-            out.bytes[byte_idx] = (out.bytes[byte_idx] << 1) | 0;
-            out.bit_count++;
+            out.data[byte_idx] = (out.data[byte_idx] << 1) | 0;
+            out.nbits++;
         } else if (src.expect_item(BIT_HIGH_US, PACKET_SPACE)) {
             break;
         } else {
@@ -95,9 +111,18 @@ optional<ToshibaAcCHData> ToshibaAcCHProtocol::decode(RemoteReceiveData src) {
         }
     }
     
-    // The two packets must match completely in length and payload
-    if (packet1.bit_count != out.bit_count || 
-        !std::equal(std::begin(packet1.bytes), std::end(packet1.bytes), std::begin(out.bytes))) {
+    // --- Post-processing & Validation ---
+
+    // Clean up the unused trailing bytes in the vectors so their actual size 
+    // matches the exact amount of data successfully read.
+    uint8_t actual_bytes_p1 = (packet1.nbits + 7) / 8;
+    uint8_t actual_bytes_out = (out.nbits + 7) / 8;
+    packet1.data.resize(actual_bytes_p1);
+    out.data.resize(actual_bytes_out);
+
+    // Now we can use the custom `==` operator we built earlier!
+    // This automatically compares both .nbits and the .data vector equality.
+    if (packet1 != out) {
         return {};
     }
 
@@ -105,19 +130,29 @@ optional<ToshibaAcCHData> ToshibaAcCHProtocol::decode(RemoteReceiveData src) {
 }
 
 void ToshibaAcCHProtocol::dump(const ToshibaAcCHData &data) {
-    // (15 bytes * 3 characters per byte "XX ") + 1 null terminator = 46
-    char hex_str[(TOSHIBA_AC_CH_MAX_BYTE * 3) + 1]; 
-    char *ptr = hex_str;
-
-    for (int i = 0; i < TOSHIBA_AC_CH_MAX_BYTE; i++) {
-        ptr += sprintf(ptr, "%02X ", data.bytes[i]);
-    }
-    
-    if (ptr > hex_str) {
-        *(ptr - 1) = '\0';
+    // If the vector is empty, log it immediately and exit
+    if (data.data.empty()) {
+        ESP_LOGI(TAG, "Received Toshiba AC (0 bits): [empty]");
+        return;
     }
 
-    ESP_LOGI(TAG, "Received Toshiba AC (%u bits): %s", data.bit_count, hex_str);
+    // Allocate a buffer dynamically based on how many bytes are actually in the vector
+    // 3 chars per byte ("XX ") + 1 for null terminator
+    std::string hex_str;
+    hex_str.reserve(data.data.size() * 3);
+
+    char buf[4];
+    for (uint8_t byte : data.data) {
+        sprintf(buf, "%02X ", byte);
+        hex_str += buf;
+    }
+
+    // Remove the trailing space if we added bytes
+    if (!hex_str.empty()) {
+        hex_str.pop_back();
+    }
+
+    ESP_LOGI(TAG, "Received Toshiba AC (%u bits): %s", data.nbits, hex_str.c_str());
 }
 
 

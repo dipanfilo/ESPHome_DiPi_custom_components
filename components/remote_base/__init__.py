@@ -2238,3 +2238,53 @@ async def Toto_action(var, config, args):
         cg.add(var.set_send_times(template_))
         template_ = await cg.templatable(36000, args, cg.uint32)
         cg.add(var.set_send_wait(template_))
+
+
+# Toshiba AC CH
+(
+    ToshibaAcChData,
+    ToshibaAcChBinarySensor,
+    ToshibaAcChTrigger,
+    ToshibaAcChAction,
+    ToshibaAcChDumper,
+) = declare_protocol("ToshibaAcCh")
+
+# 1. Update the Schema to match the new field names
+TOSHIBA_AC_CH_SCHEMA = cv.Schema(
+    {
+        cv.Required(CONF_NBITS, default=(9 * 8)): cv.uint8_t,
+        cv.Required(CONF_DATA): cv.byte_array,  # Matches std::vector<uint8_t> data
+    }
+)
+
+# 2. Update the Binary Sensor / Trigger Data Struct Mapping
+@register_binary_sensor("toshiba_ac_ch", ToshibaAcChBinarySensor, TOSHIBA_AC_CH_SCHEMA)
+def toshibaacch_binary_sensor(var, config):
+    cg.add(
+        var.set_data(
+            cg.StructInitializer(
+                ToshibaAcChData,
+                ("bit_count", config[CONF_NBITS]),
+                ("data", config[CONF_DATA]),  # Correctly binds to the std::vector<uint8_t>
+            )
+        )
+    )
+
+
+@register_trigger("toshiba_ac_ch", ToshibaAcChTrigger, ToshibaAcChData)
+def toshibaacch_trigger(var, config):
+    pass
+
+
+@register_dumper("toshiba_ac_ch", ToshibaAcChDumper)
+def toshibaacch_dumper(var, config):
+    pass
+
+
+# 3. Update the Action Generation Handler
+@register_action("toshiba_ac_ch", ToshibaAcChAction, TOSHIBA_AC_CH_SCHEMA)
+async def toshibaacch_action(var, config, args):
+    # Pass the full data structure directly to the Action object
+    template_ = await cg.templatable(config[CONF_DATA], args, cg.std_vector.template(cg.uint8))
+    cg.add(var.set_data(template_))
+
