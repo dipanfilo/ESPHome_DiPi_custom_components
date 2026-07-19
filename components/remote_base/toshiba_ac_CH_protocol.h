@@ -5,7 +5,7 @@
 
 namespace esphome::remote_base {
 
-#define TOSHIBA_AC_CH_MAX_BYTE 11
+#define TOSHIBA_AC_CH_MAX_BYTE 15
 
 
 struct ToshibaAcChData {

@@ -129,7 +129,7 @@ optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
                 ESP_LOGD("toshiba_ac_ch", "Packet 2 successfully hit the final trailing mark at bit %d", out.nbits);
                 break;
             } else {
-                ESP_LOGD("toshiba_ac_ch", "Trailing space check: next_space is %d us", next_space);
+                ESP_LOGD("toshiba_ac_ch", "Trailing space check: next_space is %ld us", next_space);
                 ESP_LOGD("toshiba_ac_ch", "Packet 2 failed at bit %d, for the final trailing mark.", bit_counter);
                 return {};
             }
