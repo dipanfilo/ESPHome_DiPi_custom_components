@@ -9,7 +9,7 @@ namespace esphome::remote_base {
 
 
 struct ToshibaAcCHData {
-    uint8_t nbits = 0; 
+    uint8_t nbits; 
     std::vector<uint8_t> data;
 
     bool operator==(const ToshibaAcCHData &rhs) const { 
