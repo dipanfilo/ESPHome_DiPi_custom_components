@@ -106,7 +106,7 @@ optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
     
     ESP_LOGD("toshiba_ac_ch", "Packet 2 Header matched! Starting bit read...");
         
-    for (uint8_t bit_counter = 0; bit_counter <= packet1.nbits; bit_counter++) {
+    for (uint8_t bit_counter = 0; bit_counter < packet1.nbits; bit_counter++) {
         uint8_t byte_idx = bit_counter / 8;
         
         if (src.expect_item(BIT_HIGH_US, BIT_ONE_LOW_US)) {
