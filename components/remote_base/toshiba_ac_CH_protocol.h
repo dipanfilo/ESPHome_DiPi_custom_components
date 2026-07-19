@@ -8,29 +8,29 @@ namespace esphome::remote_base {
 #define TOSHIBA_AC_CH_MAX_BYTE 11
 
 
-struct ToshibaAcCHData {
+struct ToshibaAcChData {
     uint8_t nbits; 
     std::vector<uint8_t> data;
 
-    bool operator==(const ToshibaAcCHData &rhs) const { 
+    bool operator==(const ToshibaAcChData &rhs) const { 
         return (nbits == rhs.nbits) && (data == rhs.data);
     }
 };
 
-class ToshibaAcCHProtocol : public RemoteProtocol<ToshibaAcCHData> {
+class ToshibaAcChProtocol : public RemoteProtocol<ToshibaAcChData> {
  public:
-  void encode(RemoteTransmitData *dst, const ToshibaAcCHData &data) override;
-  optional<ToshibaAcCHData> decode(RemoteReceiveData src) override;
-  void dump(const ToshibaAcCHData &data) override;
+  void encode(RemoteTransmitData *dst, const ToshibaAcChData &data) override;
+  optional<ToshibaAcChData> decode(RemoteReceiveData src) override;
+  void dump(const ToshibaAcChData &data) override;
 };
 
-DECLARE_REMOTE_PROTOCOL(ToshibaAcCH)
+DECLARE_REMOTE_PROTOCOL(ToshibaAcCh)
 
 template<typename... Ts> 
-class ToshibaAcCHAction : public RemoteTransmitterActionBase<Ts...> {
+class ToshibaAcChAction : public RemoteTransmitterActionBase<Ts...> {
  public:
   // For dynamic template values (lambdas)
-  TEMPLATABLE_VALUE(ToshibaAcCHData, data)
+  TEMPLATABLE_VALUE(ToshibaAcChData, data)
 
   // Optimization: For static const arrays parsed from raw configurations
   void set_data_static(const uint8_t *data_ptr, size_t size, uint8_t nbits) {
@@ -41,16 +41,16 @@ class ToshibaAcCHAction : public RemoteTransmitterActionBase<Ts...> {
 
   void encode(RemoteTransmitData *dst, Ts... x) override {
     if (this->is_static_) {
-      ToshibaAcCHProtocol().encode(dst, this->static_data_);
+      ToshibaAcChProtocol().encode(dst, this->static_data_);
     } else {
-      ToshibaAcCHData dynamic_data = this->data_.value(x...);
-      ToshibaAcCHProtocol().encode(dst, dynamic_data);
+      ToshibaAcChData dynamic_data = this->data_.value(x...);
+      ToshibaAcChProtocol().encode(dst, dynamic_data);
     }
   }
 
  protected:
   bool is_static_{false};
-  ToshibaAcCHData static_data_{};
+  ToshibaAcChData static_data_{};
 };
 
 }  // namespace esphome::remote_base
