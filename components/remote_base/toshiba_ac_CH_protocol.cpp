@@ -17,7 +17,7 @@ static constexpr uint32_t FOOTER_HIGH_US = 560;
 static constexpr uint32_t FOOTER_LOW_US = 4500;
 static constexpr uint16_t PACKET_SPACE = 5500;
 
-void ToshibaAcCHProtocol::encode(RemoteTransmitData *dst, const ToshibaAcCHData &data) {
+void ToshibaAcChProtocol::encode(RemoteTransmitData *dst, const ToshibaAcChData &data) {
     // Safety check: Ensure the vector actually contains data to send
     if (data.data.empty() || data.nbits == 0) {
         return;
@@ -59,9 +59,9 @@ void ToshibaAcCHProtocol::encode(RemoteTransmitData *dst, const ToshibaAcCHData 
     }
 }
 
-optional<ToshibaAcCHData> ToshibaAcCHProtocol::decode(RemoteReceiveData src) {
-    ToshibaAcCHData packet1; 
-    ToshibaAcCHData out; 
+optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
+    ToshibaAcChData packet1; 
+    ToshibaAcChData out; 
     
     packet1.nbits = 0;
     out.nbits = 0;
@@ -129,7 +129,7 @@ optional<ToshibaAcCHData> ToshibaAcCHProtocol::decode(RemoteReceiveData src) {
     return out;
 }
 
-void ToshibaAcCHProtocol::dump(const ToshibaAcCHData &data) {
+void ToshibaAcChProtocol::dump(const ToshibaAcChData &data) {
     // If the vector is empty, log it immediately and exit
     if (data.data.empty()) {
         ESP_LOGI(TAG, "Received Toshiba AC (0 bits): [empty]");
@@ -156,7 +156,7 @@ void ToshibaAcCHProtocol::dump(const ToshibaAcCHData &data) {
 }
 
 
-//void ToshibaAcCHProtocol::dump(const ToshibaAcCHData &data) {
+//void ToshibaAcChProtocol::dump(const ToshibaAcChData &data) {
 //    ESP_LOG_BUFFER_HEX(TAG, data.bytes, 15);
 //}
 
