@@ -2240,7 +2240,10 @@ async def Toto_action(var, config, args):
         cg.add(var.set_send_wait(template_))
 
 
-# Toshiba AC CH
+
+
+
+# Toshiba AC CH Base Protocol Registrations
 (
     ToshibaAcChData,
     ToshibaAcChBinarySensor,
@@ -2249,42 +2252,53 @@ async def Toto_action(var, config, args):
     ToshibaAcChDumper,
 ) = declare_protocol("ToshibaAcCh")
 
-# 1. Update the Schema to match the new field names
+# Configuration Schema validation
 TOSHIBA_AC_CH_SCHEMA = cv.Schema(
     {
         cv.Optional(CONF_NBITS, default=72): cv.uint8_t,
-        cv.Required(CONF_DATA): cv.byte_array,
+        cv.Required(CONF_DATA): cv.hex_uint8_list,
     }
 )
 
-# 2. Update the Binary Sensor / Trigger Data Struct Mapping
 @register_binary_sensor("toshiba_ac_ch", ToshibaAcChBinarySensor, TOSHIBA_AC_CH_SCHEMA)
 def toshibaacch_binary_sensor(var, config):
     cg.add(
         var.set_data(
             cg.StructInitializer(
                 ToshibaAcChData,
-                ("bit_count", config[CONF_NBITS]),
-                ("data", config[CONF_DATA]),  # Correctly binds to the std::vector<uint8_t>
+                ("nbits", config[CONF_NBITS]),
+                ("data", config[CONF_DATA]),
             )
         )
     )
-
 
 @register_trigger("toshiba_ac_ch", ToshibaAcChTrigger, ToshibaAcChData)
 def toshibaacch_trigger(var, config):
     pass
 
-
 @register_dumper("toshiba_ac_ch", ToshibaAcChDumper)
 def toshibaacch_dumper(var, config):
     pass
 
-
-# 3. Update the Action Generation Handler
 @register_action("toshiba_ac_ch", ToshibaAcChAction, TOSHIBA_AC_CH_SCHEMA)
 async def toshibaacch_action(var, config, args):
-    # Pass the full data structure directly to the Action object
-    template_ = await cg.templatable(config[CONF_DATA], args, cg.std_vector.template(cg.uint8))
-    cg.add(var.set_data(template_))
-
+    nbits_tmpl = await cg.templatable(config[CONF_NBITS], args, cg.uint8)
+    data_ = config[CONF_DATA]
+    
+    if cg.is_template(data_):
+        # Fallback Dynamic Path: Evaluated at runtime
+        data_tmpl = await cg.templatable(data_, args, cg.std_vector.template(cg.uint8))
+        cg.add(
+            var.set_data(
+                cg.StructInitializer(
+                    ToshibaAcChData,
+                    ("nbits", nbits_tmpl),
+                    ("data", data_tmpl),
+                )
+            )
+        )
+    else:
+        # Optimized Static Path: Saves precious heap RAM at compilation
+        arr_id = ID(f"{var.base}_data", is_declaration=True, type=cg.uint8)
+        arr = cg.static_const_array(arr_id, cg.ArrayInitializer(*data_))
+        cg.add(var.set_data_static(arr, len(data_), nbits_tmpl))
