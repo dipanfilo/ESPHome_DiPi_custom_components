@@ -119,6 +119,7 @@ optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
             ESP_LOGD("toshiba_ac_ch", "Packet 2 hit PACKET_SPACE break at bit %d", out.nbits);
             break;
         } else if (src.peek_mark(BIT_HIGH_US)) {
+            src.expect_mark(BIT_HIGH_US);
             int32_t next_space = std::abs(src[1]); 
 
             if (next_space > PACKET_SPACE) {
@@ -126,7 +127,7 @@ optional<ToshibaAcChData> ToshibaAcChProtocol::decode(RemoteReceiveData src) {
                 ESP_LOGD("toshiba_ac_ch", "Packet 2 successfully hit the final trailing mark at bit %d", out.nbits);
                 break;
             } else {
-                ESP_LOGD("toshiba_ac_ch", "Packet 2 failed at bit %d, Unexpected pulse timing.", bit_counter);
+                ESP_LOGD("toshiba_ac_ch", "Packet 2 failed at bit %d, for the final trailing mark.", bit_counter);
                 return {};
             }
         } else {
