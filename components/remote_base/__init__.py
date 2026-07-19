@@ -2252,8 +2252,8 @@ async def Toto_action(var, config, args):
 # 1. Update the Schema to match the new field names
 TOSHIBA_AC_CH_SCHEMA = cv.Schema(
     {
-        cv.Required(CONF_NBITS, default=(9 * 8)): cv.uint8_t,
-        cv.Required(CONF_DATA): cv.byte_array,  # Matches std::vector<uint8_t> data
+        cv.Optional(CONF_NBITS, default=72): cv.uint8_t,
+        cv.Required(CONF_DATA): cv.byte_array,
     }
 )
 
